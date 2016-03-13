@@ -11,6 +11,8 @@ class Game {
     this.renderer.initialize();
 
     this.renderer.clear();
+
+    this.renderer.draw();
   }
 }
 

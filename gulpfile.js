@@ -20,6 +20,7 @@ gulp.task('compile', ['clean'], () => {
 
 gulp.task('browserify', ['compile'], () => {
   return browserify('compiled/astraloids.js')
+  .transform('browserify-shader')
   .bundle()
   .pipe(source('astraloids.js'))
   .pipe(buffer())
