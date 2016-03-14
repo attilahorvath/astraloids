@@ -10,9 +10,20 @@ class Game {
   run() {
     this.renderer.initialize();
 
-    this.renderer.clear();
+    this.lastTime = Date.now();
 
-    this.renderer.draw();
+    requestAnimationFrame(() => this.loop());
+  }
+
+  loop(currentTime = Date.now()) {
+    requestAnimationFrame(() => this.loop());
+
+    let deltaTime = currentTime - this.lastTime;
+
+    this.renderer.clear();
+    this.renderer.draw(deltaTime);
+
+    this.lastTime = currentTime;
   }
 }
 
