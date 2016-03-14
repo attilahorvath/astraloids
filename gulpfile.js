@@ -28,4 +28,8 @@ gulp.task('browserify', ['compile'], () => {
   .pipe(gulp.dest('dist'));
 });
 
-gulp.task('default', ['browserify']);
+gulp.task('watch', () => {
+  gulp.watch('src/**/*.js', ['browserify']);
+});
+
+gulp.task('default', ['watch', 'browserify']);
