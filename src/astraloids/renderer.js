@@ -52,10 +52,10 @@ class Renderer {
     // ];
     let vertices = [];
 
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 10000; i++) {
       let velocity = vec2.create();
       vec2.random(velocity);
-      // vec2.scale(velocity, velocity, Math.random() * 2.0);
+      vec2.scale(velocity, velocity, Math.random() * 2.0);
 
       vertices.push(0.0, 0.0, 0.0, velocity[0], velocity[1], 0.0, Math.random(), Math.random(), Math.random(), 1.0);
     }
@@ -99,7 +99,7 @@ class Renderer {
     this.gl.vertexAttribPointer(this.particleShader.vertexVelocity, 3, this.gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 10, Float32Array.BYTES_PER_ELEMENT * 3);
     this.gl.vertexAttribPointer(this.particleShader.vertexColor, 4, this.gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 10, Float32Array.BYTES_PER_ELEMENT * 6);
 
-    this.gl.drawArrays(this.gl.POINTS, 0, 1000);
+    this.gl.drawArrays(this.gl.POINTS, 0, 10000);
   }
 }
 
