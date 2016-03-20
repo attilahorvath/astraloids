@@ -29,7 +29,7 @@ gulp.task('browserify', ['compile'], () => {
 });
 
 gulp.task('watch', () => {
-  gulp.watch('src/**/*.js', ['browserify']);
+  gulp.watch(['src/**/*.js', 'shaders/**/*'], ['browserify']);
 });
 
 gulp.task('default', ['watch', 'browserify']);
