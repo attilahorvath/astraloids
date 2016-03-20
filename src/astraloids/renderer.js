@@ -55,7 +55,7 @@ class Renderer {
     for (let i = 0; i < 1000; i++) {
       let velocity = vec2.create();
       vec2.random(velocity);
-      vec2.scale(velocity, velocity, Math.random() * 2.0);
+      // vec2.scale(velocity, velocity, Math.random() * 2.0);
 
       vertices.push(0.0, 0.0, 0.0, velocity[0], velocity[1], 0.0, Math.random(), Math.random(), Math.random(), 1.0);
     }
