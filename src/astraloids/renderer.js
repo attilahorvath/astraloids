@@ -21,6 +21,10 @@ class Renderer {
     this.gl.viewport(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
     this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
+    this.gl.enable(this.gl.BLEND);
+    this.gl.blendEquation(this.gl.FUNC_ADD);
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+
     // this.simpleShader = new SimpleShader(this.gl);
     this.particleShader = new ParticleShader(this.gl);
 
