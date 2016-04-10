@@ -7,8 +7,8 @@ const stars = 500;
 import Entity from '../entity';
 
 class BackgroundLayer extends Entity {
-  constructor(game) {
-    super();
+  constructor(game, x = 0.0, y = 0.0, angle = 0.0) {
+    super(game, x, y, angle);
 
     let vertices = [];
 

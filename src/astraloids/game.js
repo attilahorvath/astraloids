@@ -22,7 +22,9 @@ class Game {
 
     this.entities.push(new Background(this));
     //this.entities.push(new Ship(this));
-    //this.entities.push(new ParticleEmitter(this));
+    this.entities.push(new ParticleEmitter(this, -300, -300));
+    this.entities.push(new ParticleEmitter(this,  300, -300));
+    this.entities.push(new ParticleEmitter(this));
 
     this.lastTime = Date.now();
 
