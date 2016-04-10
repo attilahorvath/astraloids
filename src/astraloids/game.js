@@ -24,8 +24,10 @@ class Game {
 
     this.camera.setPosition(this.renderer.canvas.width / 2, this.renderer.canvas.height / 2);
 
+    this.ship = new Ship(this);
+
     this.entities.push(new Background(this));
-    //this.entities.push(new Ship(this));
+    this.entities.push(this.ship);
     this.entities.push(new ParticleEmitter(this, -300, -300));
     this.entities.push(new ParticleEmitter(this,  300, -300));
     this.entities.push(new ParticleEmitter(this));
@@ -40,25 +42,11 @@ class Game {
 
     let deltaTime = currentTime - this.lastTime;
 
-    if (this.keyboardInput.keysDown[87]) {
-      this.camera.setPosition(this.camera.x, this.camera.y + deltaTime * 0.75);
-    }
-
-    if (this.keyboardInput.keysDown[83]) {
-      this.camera.setPosition(this.camera.x, this.camera.y - deltaTime * 0.75);
-    }
-
-    if (this.keyboardInput.keysDown[65]) {
-      this.camera.setPosition(this.camera.x + deltaTime * 0.75, this.camera.y);
-    }
-
-    if (this.keyboardInput.keysDown[68]) {
-      this.camera.setPosition(this.camera.x - deltaTime * 0.75, this.camera.y);
-    }
-
     for (let entity of this.entities) {
-      entity.updateAll(deltaTime);
+      entity.updateAll(this, deltaTime);
     }
+
+    this.camera.setPosition(this.renderer.canvas.width / 2 - this.ship.x, this.renderer.canvas.height / 2 - this.ship.y);
 
     this.renderer.clear();
 

@@ -27,7 +27,7 @@ class ParticleEmitter extends Entity {
     this.currentTime = 0;
   }
 
-  update(deltaTime) {
+  update(game, deltaTime) {
     this.currentTime += deltaTime * 0.02;
   }
 

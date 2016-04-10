@@ -5,20 +5,24 @@ const vec4 = require('gl-matrix').vec4;
 
 class Entity {
   constructor(game = null, x = 0.0, y = 0.0, angle = 0.0) {
-    this.setTransformationMatrix(x, y, angle);
+    this.x = x;
+    this.y = y;
+    this.angle = angle;
+
+    this.calculateTransformationMatrix();
 
     this.children = [];
   }
 
-  updateAll(deltaTime) {
+  updateAll(game, deltaTime) {
     for (let child of this.children) {
-      child.updateAll(deltaTime);
+      child.updateAll(game, deltaTime);
     }
 
-    this.update(deltaTime);
+    this.update(game, deltaTime);
   }
 
-  update(deltaTime) {}
+  update(game, deltaTime) {}
 
   drawAll(renderer, transformationMatrix = mat4.create()) {
     transformationMatrix = mat4.clone(transformationMatrix);
@@ -33,12 +37,12 @@ class Entity {
 
   draw(renderer, transformationMatrix = mat4.create()) {}
 
-  setTransformationMatrix(x = 0.0, y = 0.0, angle = 0.0) {
-    let translationVector = vec4.fromValues(x, y, 0.0, 1.0);
+  calculateTransformationMatrix() {
+    let translationVector = vec4.fromValues(this.x, this.y, 0.0, 1.0);
 
     this.transformationMatrix = mat4.create();
     mat4.translate(this.transformationMatrix, this.transformationMatrix, translationVector);
-    mat4.rotateZ(this.transformationMatrix, this.transformationMatrix, angle);
+    mat4.rotateZ(this.transformationMatrix, this.transformationMatrix, this.angle);
   }
 }
 

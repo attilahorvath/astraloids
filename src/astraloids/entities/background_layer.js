@@ -8,8 +8,6 @@ class BackgroundLayer extends Entity {
   constructor(game, stars = 500, pointSize = 1.0, relativeVelocity = 1.0, x = 0.0, y = 0.0, angle = 0.0) {
     super(game, x, y, angle);
 
-    this.camera = game.camera;
-
     this.stars = stars;
     this.pointSize = pointSize;
     this.relativeVelocity = relativeVelocity;
@@ -25,8 +23,11 @@ class BackgroundLayer extends Entity {
     this.pointShader = game.renderer.shaders.pointShader;
   }
 
-  update(deltaTime) {
-    this.setTransformationMatrix(-this.camera.x * this.relativeVelocity, -this.camera.y * this.relativeVelocity);
+  update(game, deltaTime) {
+    this.x = (game.ship.x - game.renderer.canvas.width / 2) * this.relativeVelocity;
+    this.y = (game.ship.y - game.renderer.canvas.height / 2) * this.relativeVelocity;
+
+    this.calculateTransformationMatrix();
   }
 
   draw(renderer, transformationMatrix = mat4.create()) {
