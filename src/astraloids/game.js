@@ -1,5 +1,7 @@
 'use strict';
 
+import KeyboardInput from './keyboard_input';
+
 import Renderer from './renderer';
 import Camera from './camera';
 
@@ -9,6 +11,8 @@ import ParticleEmitter from './entities/particle_emitter';
 
 class Game {
   constructor() {
+    this.keyboardInput = new KeyboardInput();
+
     this.renderer = new Renderer();
     this.camera = new Camera();
 
@@ -36,11 +40,27 @@ class Game {
 
     let deltaTime = currentTime - this.lastTime;
 
-    this.renderer.clear();
+    if (this.keyboardInput.keysDown[87]) {
+      this.camera.setPosition(this.camera.x, this.camera.y + deltaTime * 0.75);
+    }
+
+    if (this.keyboardInput.keysDown[83]) {
+      this.camera.setPosition(this.camera.x, this.camera.y - deltaTime * 0.75);
+    }
+
+    if (this.keyboardInput.keysDown[65]) {
+      this.camera.setPosition(this.camera.x + deltaTime * 0.75, this.camera.y);
+    }
+
+    if (this.keyboardInput.keysDown[68]) {
+      this.camera.setPosition(this.camera.x - deltaTime * 0.75, this.camera.y);
+    }
 
     for (let entity of this.entities) {
       entity.updateAll(deltaTime);
     }
+
+    this.renderer.clear();
 
     for (let entity of this.entities) {
       entity.drawAll(this.renderer, this.camera.modelViewMatrix);

@@ -9,6 +9,9 @@ class Camera {
   }
 
   setPosition(x, y) {
+    this.x = x;
+    this.y = y;
+
     this.translationVector = vec4.fromValues(x, y, 0.0, 1.0);
     this.modelViewMatrix = mat4.create();
     mat4.translate(this.modelViewMatrix, this.modelViewMatrix, this.translationVector);
