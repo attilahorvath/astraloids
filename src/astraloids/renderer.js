@@ -3,6 +3,9 @@
 const mat4 = require('gl-matrix').mat4;
 const vec4 = require('gl-matrix').vec4;
 
+const width = 1024;
+const height = 768;
+
 import SimpleShader from './shaders/simple_shader';
 import PointShader from './shaders/point_shader';
 import ParticleShader from './shaders/particle_shader';
@@ -11,8 +14,8 @@ class Renderer {
   initialize() {
     this.canvas = document.createElement('canvas');
 
-    this.canvas.width = 320;
-    this.canvas.height = 240;
+    this.canvas.width = width;
+    this.canvas.height = height;
 
     document.body.appendChild(this.canvas);
 

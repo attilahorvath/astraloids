@@ -13,7 +13,7 @@ class BackgroundLayer extends Entity {
     let vertices = [];
 
     for (let i = 0; i < stars; i++) {
-      vertices.push(-160 + Math.random() * 320, -120 + Math.random() * 240, 0.0, 1.0, 1.0, 1.0, 1.0);
+      vertices.push(-(game.renderer.canvas.width / 2) + Math.random() * game.renderer.canvas.width, -(game.renderer.canvas.height / 2) + Math.random() * game.renderer.canvas.height, 0.0, 1.0, 1.0, 1.0, 1.0);
     }
 
     this.vertexBuffer = game.renderer.createVertexBuffer(vertices);

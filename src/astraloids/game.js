@@ -18,6 +18,8 @@ class Game {
   run() {
     this.renderer.initialize();
 
+    this.camera.setPosition(this.renderer.canvas.width / 2, this.renderer.canvas.height / 2);
+
     this.entities.push(new Background(this));
     //this.entities.push(new Ship(this));
     //this.entities.push(new ParticleEmitter(this));
