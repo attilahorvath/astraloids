@@ -1,14 +1,26 @@
 'use strict';
 
 import Renderer from './renderer';
+import Camera from './camera';
+
+import Background from './entities/background';
+import Ship from './entities/ship';
+import ParticleEmitter from './entities/particle_emitter';
 
 class Game {
   constructor() {
     this.renderer = new Renderer();
+    this.camera = new Camera();
+
+    this.entities = [];
   }
 
   run() {
     this.renderer.initialize();
+
+    this.entities.push(new Background(this));
+    //this.entities.push(new Ship(this));
+    //this.entities.push(new ParticleEmitter(this));
 
     this.lastTime = Date.now();
 
@@ -21,7 +33,14 @@ class Game {
     let deltaTime = currentTime - this.lastTime;
 
     this.renderer.clear();
-    this.renderer.draw(deltaTime);
+
+    for (let entity of this.entities) {
+      entity.updateAll(deltaTime);
+    }
+
+    for (let entity of this.entities) {
+      entity.drawAll(this.renderer, this.camera.modelViewMatrix);
+    }
 
     this.lastTime = currentTime;
   }

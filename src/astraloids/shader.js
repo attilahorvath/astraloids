@@ -1,10 +1,15 @@
 'use strict';
 
-const vertexShaderSource = require('../../shaders/simple.vert');
-const fragmentShaderSource = require('../../shaders/simple.frag');
+const defaultVertexAttributes = ['vertexPosition'];
+const defaultUniforms = ['modelViewMatrix', 'projectionMatrix'];
 
-class SimpleShader {
-  constructor(gl) {
+class Shader {
+  constructor(renderer, vertexShaderSource, fragmentShaderSource, vertexAttributes = [], uniforms = []) {
+    const gl = renderer.gl;
+
+    this.vertexAttributes = defaultVertexAttributes.concat(vertexAttributes);
+    this.uniforms = defaultUniforms.concat(uniforms);
+
     this.vertexShader = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(this.vertexShader, vertexShaderSource());
     gl.compileShader(this.vertexShader);
@@ -30,18 +35,26 @@ class SimpleShader {
       alert(gl.getProgramInfoLog(this.shaderProgram));
     }
 
-    this.modelViewMatrix = gl.getUniformLocation(this.shaderProgram, 'modelViewMatrix');
+    for (let vertexAttribute of this.vertexAttributes) {
+      this[vertexAttribute] = gl.getAttribLocation(this.shaderProgram, vertexAttribute);
+    }
 
-    this.projectionMatrix = gl.getUniformLocation(this.shaderProgram, 'projectionMatrix');
+    for (let uniform of this.uniforms) {
+      this[uniform] = gl.getUniformLocation(this.shaderProgram, uniform);
+    }
+  }
 
-    this.vertexPosition = gl.getAttribLocation(this.shaderProgram, 'vertexPosition');
-    gl.enableVertexAttribArray(this.vertexPosition);
+  setVertexAttributes(renderer) {}
 
-    this.vertexColor = gl.getAttribLocation(this.shaderProgram, 'vertexColor');
-    gl.enableVertexAttribArray(this.vertexColor);
+  use(renderer) {
+    const gl = renderer.gl;
 
     gl.useProgram(this.shaderProgram);
+
+    for (let vertexAttribute of this.vertexAttributes) {
+      gl.enableVertexAttribArray(this[vertexAttribute]);
+    }
   }
 }
 
-export default SimpleShader;
+export default Shader;
