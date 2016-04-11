@@ -12,9 +12,9 @@ class Background extends Entity {
     this.shipX = game.ship.x;
     this.shipY = game.ship.y;
 
-    this.children.push(new BackgroundLayer(game, 500, 1.0, 0.7, x, y, angle));
-    this.children.push(new BackgroundLayer(game, 500, 1.5, 0.8, x, y, angle));
-    this.children.push(new BackgroundLayer(game, 500, 2.0, 0.9, x, y, angle));
+    this.children.push(new BackgroundLayer(game, 500, 1.0, 0.0, x, y, angle));
+    this.children.push(new BackgroundLayer(game, 500, 1.5, 0.5, x, y, angle));
+    this.children.push(new BackgroundLayer(game, 500, 2.0, 1.0, x, y, angle));
   }
 
   update(game, deltaTime) {
@@ -29,8 +29,11 @@ class Background extends Entity {
     // TODO Refactor
 
     for (let layer of this.children) {
-      let layerX = Math.floor(this.shipX / renderer.canvas.width) * renderer.canvas.width;
-      let layerY = Math.floor(this.shipY / renderer.canvas.height) * renderer.canvas.height;
+      let offsetX = (this.shipX % renderer.canvas.width) * layer.relativeVelocity;
+      let offsetY = (this.shipY % renderer.canvas.height) * layer.relativeVelocity;
+
+      let layerX = Math.floor((this.shipX + offsetX + renderer.canvas.width / 2) / renderer.canvas.width) * renderer.canvas.width - offsetX;
+      let layerY = Math.floor((this.shipY + offsetY + renderer.canvas.height / 2) / renderer.canvas.height) * renderer.canvas.height - offsetY;
 
       layer.x = layerX;
       layer.y = layerY;
@@ -38,7 +41,7 @@ class Background extends Entity {
       layer.calculateTransformationMatrix();
       layer.drawAll(renderer, transformationMatrix);
 
-      if (this.shipX <= layer.x + renderer.canvas.width / 2) {
+      if (this.shipX <= layer.x) {
         layer.x -= renderer.canvas.width;
       } else {
         layer.x += renderer.canvas.width;
@@ -49,7 +52,7 @@ class Background extends Entity {
 
       layer.x = layerX;
 
-      if (this.shipY <= layer.y + renderer.canvas.height / 2) {
+      if (this.shipY <= layer.y) {
         layer.y -= renderer.canvas.height;
       } else {
         layer.y += renderer.canvas.height;
@@ -60,16 +63,16 @@ class Background extends Entity {
 
       layer.y = layerY;
 
-      if (this.shipX <= layer.x + renderer.canvas.width / 2) {
+      if (this.shipX <= layer.x) {
         layer.x -= renderer.canvas.width;
-        if (this.shipY <= layer.y + renderer.canvas.height / 2) {
+        if (this.shipY <= layer.y) {
           layer.y -= renderer.canvas.height;
         } else {
           layer.y += renderer.canvas.height;
         }
       } else {
         layer.x += renderer.canvas.width;
-        if (this.shipY <= layer.y + renderer.canvas.height / 2) {
+        if (this.shipY <= layer.y) {
           layer.y -= renderer.canvas.height;
         } else {
           layer.y += renderer.canvas.height;
