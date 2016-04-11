@@ -3,7 +3,6 @@
 import KeyboardInput from './keyboard_input';
 
 import Renderer from './renderer';
-import Camera from './camera';
 
 import Background from './entities/background';
 import Ship from './entities/ship';
@@ -14,7 +13,6 @@ class Game {
     this.keyboardInput = new KeyboardInput();
 
     this.renderer = new Renderer();
-    this.camera = new Camera();
 
     this.entities = [];
   }
@@ -22,15 +20,12 @@ class Game {
   run() {
     this.renderer.initialize();
 
-    this.camera.setPosition(this.renderer.canvas.width / 2, this.renderer.canvas.height / 2);
-
     this.ship = new Ship(this);
 
     this.entities.push(new Background(this));
     this.entities.push(this.ship);
-    this.entities.push(new ParticleEmitter(this, -300, -300));
-    this.entities.push(new ParticleEmitter(this,  300, -300));
     this.entities.push(new ParticleEmitter(this));
+    this.entities.push(new ParticleEmitter(this, -300, -300));
 
     this.lastTime = Date.now();
 
@@ -46,12 +41,12 @@ class Game {
       entity.updateAll(this, deltaTime);
     }
 
-    this.camera.setPosition(this.renderer.canvas.width / 2 - this.ship.x, this.renderer.canvas.height / 2 - this.ship.y);
+    this.renderer.camera.setPosition(this.renderer.canvas.width / 2 - this.ship.x, this.renderer.canvas.height / 2 - this.ship.y);
 
     this.renderer.clear();
 
     for (let entity of this.entities) {
-      entity.drawAll(this.renderer, this.camera.modelViewMatrix);
+      entity.drawAll(this.renderer);
     }
 
     this.lastTime = currentTime;

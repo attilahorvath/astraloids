@@ -15,19 +15,12 @@ class BackgroundLayer extends Entity {
     let vertices = [];
 
     for (let i = 0; i < this.stars; i++) {
-      vertices.push((-game.renderer.canvas.width / 2 - 500.0) + Math.random() * (game.renderer.canvas.width + 1000.0), (-game.renderer.canvas.height / 2 - 500.0) + Math.random() * (game.renderer.canvas.height + 1000.0), 0.0, 1.0, 1.0, 1.0, 1.0);
+      vertices.push(Math.random() * game.renderer.canvas.width, Math.random() * game.renderer.canvas.height, 0.0, 1.0, 1.0, 1.0, 1.0);
     }
 
     this.vertexBuffer = game.renderer.createVertexBuffer(vertices);
 
     this.pointShader = game.renderer.shaders.pointShader;
-  }
-
-  update(game, deltaTime) {
-    this.x = (game.ship.x - game.renderer.canvas.width / 2) * this.relativeVelocity;
-    this.y = (game.ship.y - game.renderer.canvas.height / 2) * this.relativeVelocity;
-
-    this.calculateTransformationMatrix();
   }
 
   draw(renderer, transformationMatrix = mat4.create()) {

@@ -10,6 +10,8 @@ import SimpleShader from './shaders/simple_shader';
 import PointShader from './shaders/point_shader';
 import ParticleShader from './shaders/particle_shader';
 
+import Camera from './camera';
+
 class Renderer {
   initialize() {
     this.canvas = document.createElement('canvas');
@@ -38,6 +40,8 @@ class Renderer {
     };
 
     this.lastShader = null;
+
+    this.camera = new Camera(this.canvas.width / 2, this.canvas.height / 2);
   }
 
   createVertexBuffer(vertices) {
@@ -47,6 +51,11 @@ class Renderer {
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertices), this.gl.STATIC_DRAW);
 
     return vertexBuffer;
+  }
+
+  fillVertexBuffer(vertexBuffer, vertices) {
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertexBuffer);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertices), this.gl.STATIC_DRAW);
   }
 
   clear() {
@@ -62,7 +71,10 @@ class Renderer {
 
     shader.setVertexAttributes(this);
 
-    this.gl.uniformMatrix4fv(shader.modelViewMatrix, false, transformationMatrix);
+    let modelViewMatrix = mat4.clone(this.camera.modelViewMatrix);
+    mat4.multiply(modelViewMatrix, modelViewMatrix, transformationMatrix)
+
+    this.gl.uniformMatrix4fv(shader.modelViewMatrix, false, modelViewMatrix);
     this.gl.uniformMatrix4fv(shader.projectionMatrix, false, this.projectionMatrix);
 
     this.gl.drawArrays(mode, 0, count);

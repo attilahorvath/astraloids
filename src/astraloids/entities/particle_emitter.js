@@ -2,6 +2,7 @@
 
 const mat4 = require('gl-matrix').mat4;
 const vec2 = require('gl-matrix').vec2;
+const vec3 = require('gl-matrix').vec3;
 const vec4 = require('gl-matrix').vec4;
 
 import Entity from '../entity';
@@ -10,21 +11,19 @@ class ParticleEmitter extends Entity {
   constructor(game, x = 0.0, y = 0.0, angle = 0.0) {
     super(game, x, y, angle);
 
-    let vertices = [];
+    this.vertices = [];
 
-    for (let i = 0; i < 5000; i++) {
-      let velocity = vec2.create();
-      vec2.random(velocity);
-      vec2.scale(velocity, velocity, Math.random() * 2.0);
-
-      vertices.push(0.0, 0.0, 0.0, velocity[0], velocity[1], 0.0, Math.random(), Math.random(), Math.random(), 1.0);
-    }
-
-    this.vertexBuffer = game.renderer.createVertexBuffer(vertices);
+    this.vertexBuffer = game.renderer.createVertexBuffer(this.vertices);
 
     this.particleShader = game.renderer.shaders.particleShader;
 
     this.currentTime = 0;
+  }
+
+  emitParticle(renderer, velocity) {
+    this.vertices.push(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Math.random(), Math.random(), Math.random(), 1.0);
+
+    renderer.fillVertexBuffer(this.vertexBuffer, this.vertices);
   }
 
   update(game, deltaTime) {
@@ -32,9 +31,11 @@ class ParticleEmitter extends Entity {
   }
 
   draw(renderer, transformationMatrix = mat4.create()) {
-    this.particleShader.currentTimeValue = this.currentTime;
+    if (this.vertices.length > 0) {
+      this.particleShader.currentTimeValue = this.currentTime;
 
-    renderer.draw(this.particleShader, transformationMatrix, this.vertexBuffer, renderer.gl.POINTS, 5000);
+      renderer.draw(this.particleShader, transformationMatrix, this.vertexBuffer, renderer.gl.POINTS, this.vertices.length / 10);
+    }
   }
 }
 

@@ -5,6 +5,7 @@ const mat4 = require('gl-matrix').mat4;
 const vec2 = require('gl-matrix').vec2;
 
 import Entity from '../entity';
+import ParticleEmitter from './particle_emitter';
 
 class Ship extends Entity {
   constructor(game, x = 0.0, y = 0.0, angle = 0.0) {
@@ -22,6 +23,13 @@ class Ship extends Entity {
     this.vertexBuffer = game.renderer.createVertexBuffer(vertices);
 
     this.simpleShader = game.renderer.shaders.simpleShader;
+
+    this.thruster = new ParticleEmitter(game, 0.0, 30.0, 0.0);
+
+    this.children.push(this.thruster);
+
+    this.particleTimer = 0;
+    this.emitParticle = false;
   }
 
   update(game, deltaTime) {
@@ -53,7 +61,7 @@ class Ship extends Entity {
 
     vec2.set(this.velocity, this.velocity[0] + this.acceleration[0] * deltaTime, this.velocity[1] + this.acceleration[1] * deltaTime);
 
-    if (vec2.length(this.velocity) > 3) {
+    if (vec2.length(this.velocity) > 0.5) {
       this.velocity = oldVelocity;
     }
 
@@ -61,10 +69,22 @@ class Ship extends Entity {
     this.y += this.velocity[1] * deltaTime;
 
     this.calculateTransformationMatrix();
+
+    this.particleTimer += deltaTime;
+
+    if (this.particleTimer >= 10) {
+      this.particleTimer = 0;
+      this.emitParticle = true;
+    }
   }
 
   draw(renderer, transformationMatrix = mat4.create()) {
     renderer.draw(this.simpleShader, transformationMatrix, this.vertexBuffer, renderer.gl.TRIANGLES, 3);
+
+    if (this.emitParticle) {
+      this.thruster.emitParticle(renderer, this.velocity);
+      this.emitParticle = false;
+    }
   }
 }
 

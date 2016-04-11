@@ -4,8 +4,8 @@ const mat4 = require('gl-matrix').mat4;
 const vec4 = require('gl-matrix').vec4;
 
 class Camera {
-  constructor(game) {
-    this.setPosition(0, 0);
+  constructor(x = 0, y = 0) {
+    this.setPosition(x, y);
   }
 
   setPosition(x, y) {

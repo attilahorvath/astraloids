@@ -7,9 +7,11 @@ import Shader from '../shader';
 
 class ParticleShader extends Shader {
   constructor(renderer) {
-    super(renderer, vertexShaderSource, fragmentShaderSource, ['vertexVelocity', 'vertexColor'], ['currentTime']);
+    super(renderer, vertexShaderSource, fragmentShaderSource, ['vertexVelocity', 'vertexColor'], ['currentTime', 'lifetime', 'pointSize']);
 
     this.currentTimeValue = 0;
+    this.lifetimeValue = 100.0;
+    this.pointSizeValue = 1.5;
   }
 
   setVertexAttributes(renderer) {
@@ -24,6 +26,8 @@ class ParticleShader extends Shader {
     super.use(renderer);
 
     renderer.gl.uniform1f(this.currentTime, this.currentTimeValue);
+    renderer.gl.uniform1f(this.lifetime, this.lifetimeValue);
+    renderer.gl.uniform1f(this.pointSize, this.pointSizeValue);
   }
 }
 
