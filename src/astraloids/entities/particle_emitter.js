@@ -20,21 +20,27 @@ class ParticleEmitter extends Entity {
     this.currentTime = 0;
   }
 
-  emitParticle(renderer, velocity) {
-    this.vertices.push(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Math.random(), Math.random(), Math.random(), 1.0);
+  emitParticle(renderer, velocity, transformationMatrix = mat4.create()) {
+    transformationMatrix = mat4.clone(transformationMatrix);
+    mat4.multiply(transformationMatrix, transformationMatrix, this.transformationMatrix);
+
+    let position = vec2.create();
+    vec2.transformMat4(position, position, transformationMatrix);
+
+    this.vertices.push(position[0], position[1], 0.0, velocity[0], velocity[1], 0.0, Math.random(), Math.random(), Math.random(), 1.0, this.currentTime);
 
     renderer.fillVertexBuffer(this.vertexBuffer, this.vertices);
   }
 
   update(game, deltaTime) {
-    this.currentTime += deltaTime * 0.02;
+    this.currentTime += deltaTime;
   }
 
   draw(renderer, transformationMatrix = mat4.create()) {
     if (this.vertices.length > 0) {
       this.particleShader.currentTimeValue = this.currentTime;
 
-      renderer.draw(this.particleShader, transformationMatrix, this.vertexBuffer, renderer.gl.POINTS, this.vertices.length / 10);
+      renderer.draw(this.particleShader, mat4.create(), this.vertexBuffer, renderer.gl.POINTS, this.vertices.length / 11);
     }
   }
 }

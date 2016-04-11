@@ -82,7 +82,9 @@ class Ship extends Entity {
     renderer.draw(this.simpleShader, transformationMatrix, this.vertexBuffer, renderer.gl.TRIANGLES, 3);
 
     if (this.emitParticle) {
-      this.thruster.emitParticle(renderer, this.velocity);
+      let particleVelocity = vec2.fromValues(-this.velocity[0], -this.velocity[1]);
+      vec2.scale(particleVelocity, particleVelocity, 10.0);
+      this.thruster.emitParticle(renderer, particleVelocity, transformationMatrix);
       this.emitParticle = false;
     }
   }
