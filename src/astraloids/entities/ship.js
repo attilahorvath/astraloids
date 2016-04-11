@@ -25,15 +25,36 @@ class Ship extends Entity {
     this.simpleShader = game.renderer.shaders.simpleShader;
 
     this.thruster = new ParticleEmitter(game, 0.0, 30.0, 0.0);
+    this.thruster.pointSize = 5.0;
+    this.thruster.lifetime = 500.0;
+
+    this.frontLeftSteerer = new ParticleEmitter(game, -5.0, -20.0, 0.0);
+    this.frontLeftSteerer.pointSize = 3.0;
+    this.frontLeftSteerer.lifetime = 300.0;
+
+    this.frontRightSteerer = new ParticleEmitter(game, 5.0, -20.0, 0.0);
+    this.frontRightSteerer.pointSize = 3.0;
+    this.frontRightSteerer.lifetime = 300.0;
+
+    this.backLeftSteerer = new ParticleEmitter(game, -20.0, 20.0, 0.0);
+    this.backLeftSteerer.pointSize = 3.0;
+    this.backLeftSteerer.lifetime = 300.0;
+
+    this.backRightSteerer = new ParticleEmitter(game, 20.0, 20.0, 0.0);
+    this.backRightSteerer.pointSize = 3.0;
+    this.backRightSteerer.lifetime = 300.0;
 
     this.children.push(this.thruster);
-
-    this.particleTimer = 0;
-    this.emitParticle = false;
+    this.children.push(this.frontLeftSteerer);
+    this.children.push(this.frontRightSteerer);
+    this.children.push(this.backLeftSteerer);
+    this.children.push(this.backRightSteerer);
   }
 
-  update(game, deltaTime) {
+  update(game, deltaTime, transformationMatrix = mat4.create()) {
     let accelerationSize = 0.0;
+    let steeringLeft = false;
+    let steeringRight = false;
 
     if (game.keyboardInput.keysDown[87]) {
       accelerationSize = 0.001;
@@ -45,10 +66,12 @@ class Ship extends Entity {
 
     if (game.keyboardInput.keysDown[65]) {
       this.angle -= deltaTime * 0.01;
+      steeringLeft = true;
     }
 
     if (game.keyboardInput.keysDown[68]) {
       this.angle += deltaTime * 0.01;
+      steeringRight = true;
     }
 
     let accelerationMatrix = mat2.create();
@@ -57,12 +80,11 @@ class Ship extends Entity {
     vec2.set(this.acceleration, 0.0, -accelerationSize);
     vec2.transformMat2(this.acceleration, this.acceleration, accelerationMatrix);
 
-    let oldVelocity = vec2.clone(this.velocity);
-
     vec2.set(this.velocity, this.velocity[0] + this.acceleration[0] * deltaTime, this.velocity[1] + this.acceleration[1] * deltaTime);
 
-    if (vec2.length(this.velocity) > 0.5) {
-      this.velocity = oldVelocity;
+    if (vec2.length(this.velocity) > 0.2) {
+      vec2.normalize(this.velocity, this.velocity);
+      vec2.scale(this.velocity, this.velocity, 0.2);
     }
 
     this.x += this.velocity[0] * deltaTime;
@@ -70,23 +92,49 @@ class Ship extends Entity {
 
     this.calculateTransformationMatrix();
 
-    this.particleTimer += deltaTime;
+    if (accelerationSize > 0.0) {
+      this.thruster.emitParticle(game.renderer, vec2.create(), transformationMatrix, 0.5 + Math.random() * 0.5, 0, 0);
+    }
 
-    if (this.particleTimer >= 10) {
-      this.particleTimer = 0;
-      this.emitParticle = true;
+    if (steeringLeft) {
+      for (let i = 0; i < 10; i++) {
+        let particleVelocity = vec2.fromValues(0.03 + Math.random() * 0.05, Math.random() * 0.01);
+        let rotationMatrix = mat2.create();
+        mat2.rotate(rotationMatrix, rotationMatrix, this.angle);
+        vec2.transformMat2(particleVelocity, particleVelocity, rotationMatrix);
+        this.frontRightSteerer.emitParticle(game.renderer, particleVelocity, transformationMatrix, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5);
+      }
+
+      for (let i = 0; i < 10; i++) {
+        let particleVelocity = vec2.fromValues(-0.03 - Math.random() * 0.05, Math.random() * 0.01);
+        let rotationMatrix = mat2.create();
+        mat2.rotate(rotationMatrix, rotationMatrix, this.angle);
+        vec2.transformMat2(particleVelocity, particleVelocity, rotationMatrix);
+        this.backLeftSteerer.emitParticle(game.renderer, particleVelocity, transformationMatrix, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5);
+      }
+    }
+
+    if (steeringRight) {
+      for (let i = 0; i < 10; i++) {
+        let particleVelocity = vec2.fromValues(-0.03 - Math.random() * 0.05, Math.random() * 0.01);
+        let rotationMatrix = mat2.create();
+        mat2.rotate(rotationMatrix, rotationMatrix, this.angle);
+        vec2.transformMat2(particleVelocity, particleVelocity, rotationMatrix);
+        this.frontLeftSteerer.emitParticle(game.renderer, particleVelocity, transformationMatrix, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5);
+      }
+
+      for (let i = 0; i < 10; i++) {
+        let particleVelocity = vec2.fromValues(0.03 + Math.random() * 0.05, Math.random() * 0.01);
+        let rotationMatrix = mat2.create();
+        mat2.rotate(rotationMatrix, rotationMatrix, this.angle);
+        vec2.transformMat2(particleVelocity, particleVelocity, rotationMatrix);
+        this.backRightSteerer.emitParticle(game.renderer, particleVelocity, transformationMatrix, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5);
+      }
     }
   }
 
-  draw(renderer, transformationMatrix = mat4.create()) {
+  draw(renderer, deltaTime, transformationMatrix = mat4.create()) {
     renderer.draw(this.simpleShader, transformationMatrix, this.vertexBuffer, renderer.gl.TRIANGLES, 3);
-
-    if (this.emitParticle) {
-      let particleVelocity = vec2.fromValues(-this.velocity[0], -this.velocity[1]);
-      vec2.scale(particleVelocity, particleVelocity, 10.0);
-      this.thruster.emitParticle(renderer, particleVelocity, transformationMatrix);
-      this.emitParticle = false;
-    }
   }
 }
 

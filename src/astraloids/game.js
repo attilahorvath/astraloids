@@ -46,7 +46,7 @@ class Game {
     this.renderer.clear();
 
     for (let entity of this.entities) {
-      entity.drawAll(this.renderer);
+      entity.drawAll(this.renderer, deltaTime);
     }
 
     this.lastTime = currentTime;

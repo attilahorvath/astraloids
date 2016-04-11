@@ -14,28 +14,31 @@ class Entity {
     this.children = [];
   }
 
-  updateAll(game, deltaTime) {
-    for (let child of this.children) {
-      child.updateAll(game, deltaTime);
-    }
-
-    this.update(game, deltaTime);
-  }
-
-  update(game, deltaTime) {}
-
-  drawAll(renderer, transformationMatrix = mat4.create()) {
+  updateAll(game, deltaTime, transformationMatrix = mat4.create()) {
     transformationMatrix = mat4.clone(transformationMatrix);
     mat4.multiply(transformationMatrix, transformationMatrix, this.transformationMatrix);
 
     for (let child of this.children) {
-      child.drawAll(renderer, transformationMatrix);
+      child.updateAll(game, deltaTime, transformationMatrix);
     }
 
-    this.draw(renderer, transformationMatrix);
+    this.update(game, deltaTime, transformationMatrix);
   }
 
-  draw(renderer, transformationMatrix = mat4.create()) {}
+  update(game, deltaTime, transformationMatrix = mat4.create()) {}
+
+  drawAll(renderer, deltaTime, transformationMatrix = mat4.create()) {
+    transformationMatrix = mat4.clone(transformationMatrix);
+    mat4.multiply(transformationMatrix, transformationMatrix, this.transformationMatrix);
+
+    for (let child of this.children) {
+      child.drawAll(renderer, deltaTime, transformationMatrix);
+    }
+
+    this.draw(renderer, deltaTime, transformationMatrix);
+  }
+
+  draw(renderer, deltaTime, transformationMatrix = mat4.create()) {}
 
   calculateTransformationMatrix() {
     let translationVector = vec4.fromValues(this.x, this.y, 0.0, 1.0);

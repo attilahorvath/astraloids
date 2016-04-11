@@ -17,12 +17,12 @@ class Background extends Entity {
     this.children.push(new BackgroundLayer(game, 500, 2.0, 1.0, x, y, angle));
   }
 
-  update(game, deltaTime) {
+  update(game, deltaTime, transformationMatrix = mat4.create()) {
     this.shipX = game.ship.x;
     this.shipY = game.ship.y;
   }
 
-  drawAll(renderer, transformationMatrix = mat4.create()) {
+  drawAll(renderer, deltaTime, transformationMatrix = mat4.create()) {
     transformationMatrix = mat4.clone(transformationMatrix);
     mat4.multiply(transformationMatrix, transformationMatrix, this.transformationMatrix);
 
@@ -39,7 +39,7 @@ class Background extends Entity {
       layer.y = layerY;
 
       layer.calculateTransformationMatrix();
-      layer.drawAll(renderer, transformationMatrix);
+      layer.drawAll(renderer, deltaTime, transformationMatrix);
 
       if (this.shipX <= layer.x) {
         layer.x -= renderer.canvas.width;
@@ -48,7 +48,7 @@ class Background extends Entity {
       }
 
       layer.calculateTransformationMatrix();
-      layer.drawAll(renderer, transformationMatrix);
+      layer.drawAll(renderer, deltaTime, transformationMatrix);
 
       layer.x = layerX;
 
@@ -59,7 +59,7 @@ class Background extends Entity {
       }
 
       layer.calculateTransformationMatrix();
-      layer.drawAll(renderer, transformationMatrix);
+      layer.drawAll(renderer, deltaTime, transformationMatrix);
 
       layer.y = layerY;
 
@@ -80,7 +80,7 @@ class Background extends Entity {
       }
 
       layer.calculateTransformationMatrix();
-      layer.drawAll(renderer, transformationMatrix);
+      layer.drawAll(renderer, deltaTime, transformationMatrix);
     }
   }
 }

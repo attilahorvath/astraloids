@@ -14,7 +14,7 @@ varying vec4 color;
 
 void main() {
   color = vertexColor;
-  //color.a = 1.0 - currentTime / (lifetime - timestamp);
+  color.a = 1.0 - (currentTime - timestamp) / lifetime;
 
   vec3 currentPosition = vec3(vertexPosition + vertexVelocity * (currentTime - timestamp));
 

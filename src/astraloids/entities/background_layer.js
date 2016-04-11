@@ -23,7 +23,7 @@ class BackgroundLayer extends Entity {
     this.pointShader = game.renderer.shaders.pointShader;
   }
 
-  draw(renderer, transformationMatrix = mat4.create()) {
+  draw(renderer, deltaTime, transformationMatrix = mat4.create()) {
     this.pointShader.pointSizeValue = this.pointSize;
 
     renderer.draw(renderer.shaders.pointShader, transformationMatrix, this.vertexBuffer, renderer.gl.POINTS, this.stars);
