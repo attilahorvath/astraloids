@@ -56,20 +56,20 @@ class Ship extends Entity {
     let steeringLeft = false;
     let steeringRight = false;
 
-    if (game.keyboardInput.keysDown[87]) {
+    if (game.keyboardInput.keysDown[87] || game.keyboardInput.keysDown[38]) {
       accelerationSize = 0.001;
     }
 
-    if (game.keyboardInput.keysDown[83]) {
+    if (game.keyboardInput.keysDown[83] || game.keyboardInput.keysDown[40]) {
       accelerationSize = -0.0002;
     }
 
-    if (game.keyboardInput.keysDown[65]) {
+    if (game.keyboardInput.keysDown[65] || game.keyboardInput.keysDown[37]) {
       this.angle -= deltaTime * 0.002;
       steeringLeft = true;
     }
 
-    if (game.keyboardInput.keysDown[68]) {
+    if (game.keyboardInput.keysDown[68] || game.keyboardInput.keysDown[39]) {
       this.angle += deltaTime * 0.002;
       steeringRight = true;
     }
@@ -97,48 +97,29 @@ class Ship extends Entity {
     }
 
     if (steeringLeft) {
-      for (let i = 0; i < 10; i++) {
-        let particleVelocity = vec2.fromValues(0.2 + Math.random() * 0.2, -0.05 + Math.random() * 0.05);
-        let rotationMatrix = mat2.create();
-        mat2.rotate(rotationMatrix, rotationMatrix, this.angle);
-        vec2.transformMat2(particleVelocity, particleVelocity, rotationMatrix);
-        vec2.add(particleVelocity, particleVelocity, this.velocity);
-        this.frontRightSteerer.emitParticle(game.renderer, particleVelocity, transformationMatrix, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5);
-      }
-
-      for (let i = 0; i < 10; i++) {
-        let particleVelocity = vec2.fromValues(-0.2 - Math.random() * 0.2, -0.05 + Math.random() * 0.05);
-        let rotationMatrix = mat2.create();
-        mat2.rotate(rotationMatrix, rotationMatrix, this.angle);
-        vec2.transformMat2(particleVelocity, particleVelocity, rotationMatrix);
-        vec2.add(particleVelocity, particleVelocity, this.velocity);
-        this.backLeftSteerer.emitParticle(game.renderer, particleVelocity, transformationMatrix, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5);
-      }
+      this.emitSteeringParticles(this.frontRightSteerer, game.renderer, 10, 1.0, transformationMatrix);
+      this.emitSteeringParticles(this.backLeftSteerer, game.renderer, 10, -1.0, transformationMatrix);
     }
 
     if (steeringRight) {
-      for (let i = 0; i < 10; i++) {
-        let particleVelocity = vec2.fromValues(-0.2 - Math.random() * 0.2, -0.05 + Math.random() * 0.05);
-        let rotationMatrix = mat2.create();
-        mat2.rotate(rotationMatrix, rotationMatrix, this.angle);
-        vec2.transformMat2(particleVelocity, particleVelocity, rotationMatrix);
-        vec2.add(particleVelocity, particleVelocity, this.velocity);
-        this.frontLeftSteerer.emitParticle(game.renderer, particleVelocity, transformationMatrix, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5);
-      }
-
-      for (let i = 0; i < 10; i++) {
-        let particleVelocity = vec2.fromValues(0.2 + Math.random() * 0.2, -0.05 + Math.random() * 0.05);
-        let rotationMatrix = mat2.create();
-        mat2.rotate(rotationMatrix, rotationMatrix, this.angle);
-        vec2.transformMat2(particleVelocity, particleVelocity, rotationMatrix);
-        vec2.add(particleVelocity, particleVelocity, this.velocity);
-        this.backRightSteerer.emitParticle(game.renderer, particleVelocity, transformationMatrix, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5);
-      }
+      this.emitSteeringParticles(this.frontLeftSteerer, game.renderer, 10, -1.0, transformationMatrix);
+      this.emitSteeringParticles(this.backRightSteerer, game.renderer, 10, 1.0, transformationMatrix);
     }
   }
 
   draw(renderer, deltaTime, transformationMatrix = mat4.create()) {
     renderer.draw(this.simpleShader, transformationMatrix, this.vertexBuffer, renderer.gl.TRIANGLES, 3);
+  }
+
+  emitSteeringParticles(emitter, renderer, count, velocityX, transformationMatrix) {
+    for (let i = 0; i < count; i++) {
+      let particleVelocity = vec2.fromValues((0.2 + Math.random() * 0.2) * velocityX, -0.05 + Math.random() * 0.1);
+      let rotationMatrix = mat2.create();
+      mat2.rotate(rotationMatrix, rotationMatrix, this.angle);
+      vec2.transformMat2(particleVelocity, particleVelocity, rotationMatrix);
+      vec2.add(particleVelocity, particleVelocity, this.velocity);
+      emitter.emitParticle(renderer, particleVelocity, transformationMatrix, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5);
+    }
   }
 }
 
