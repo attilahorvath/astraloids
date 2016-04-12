@@ -102,6 +102,7 @@ class Ship extends Entity {
         let rotationMatrix = mat2.create();
         mat2.rotate(rotationMatrix, rotationMatrix, this.angle);
         vec2.transformMat2(particleVelocity, particleVelocity, rotationMatrix);
+        vec2.add(particleVelocity, particleVelocity, this.velocity);
         this.frontRightSteerer.emitParticle(game.renderer, particleVelocity, transformationMatrix, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5);
       }
 
@@ -110,6 +111,7 @@ class Ship extends Entity {
         let rotationMatrix = mat2.create();
         mat2.rotate(rotationMatrix, rotationMatrix, this.angle);
         vec2.transformMat2(particleVelocity, particleVelocity, rotationMatrix);
+        vec2.add(particleVelocity, particleVelocity, this.velocity);
         this.backLeftSteerer.emitParticle(game.renderer, particleVelocity, transformationMatrix, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5);
       }
     }
@@ -120,6 +122,7 @@ class Ship extends Entity {
         let rotationMatrix = mat2.create();
         mat2.rotate(rotationMatrix, rotationMatrix, this.angle);
         vec2.transformMat2(particleVelocity, particleVelocity, rotationMatrix);
+        vec2.add(particleVelocity, particleVelocity, this.velocity);
         this.frontLeftSteerer.emitParticle(game.renderer, particleVelocity, transformationMatrix, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5);
       }
 
@@ -128,6 +131,7 @@ class Ship extends Entity {
         let rotationMatrix = mat2.create();
         mat2.rotate(rotationMatrix, rotationMatrix, this.angle);
         vec2.transformMat2(particleVelocity, particleVelocity, rotationMatrix);
+        vec2.add(particleVelocity, particleVelocity, this.velocity);
         this.backRightSteerer.emitParticle(game.renderer, particleVelocity, transformationMatrix, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5);
       }
     }
