@@ -13,10 +13,6 @@ class ParticleEmitter extends Entity {
   constructor(game, x = 0.0, y = 0.0, angle = 0.0) {
     super(game, x, y, angle);
 
-    this.vertices = new Float32Array(maxVertices * 11);
-    this.vertexCount = 0;
-    this.vertexIndex = 0;
-
     this.vertexBuffer = game.renderer.createVertexBuffer(this.vertices);
 
     this.particleShader = game.renderer.shaders.particleShader;
@@ -24,6 +20,10 @@ class ParticleEmitter extends Entity {
     this.currentTime = 0;
     this.lifetime = this.particleShader.lifetimeValue;
     this.pointSize = this.particleShader.pointSizeValue;
+
+    this.vertices = new Float32Array(maxVertices * (this.particleShader.vertexSize / Float32Array.BYTES_PER_ELEMENT));
+    this.vertexCount = 0;
+    this.vertexIndex = 0;
   }
 
   emitParticle(renderer, velocity, transformationMatrix = mat4.create(), red = Math.random(), green = Math.random(), blue = Math.random()) {
@@ -41,17 +41,19 @@ class ParticleEmitter extends Entity {
 
     this.vertexIndex = (this.vertexIndex + 1) % maxVertices;
 
-    this.vertices[this.vertexIndex * 11]      = position[0];
-    this.vertices[this.vertexIndex * 11 + 1]  = position[1];
-    this.vertices[this.vertexIndex * 11 + 2]  = 0.0;
-    this.vertices[this.vertexIndex * 11 + 3]  = velocity[0];
-    this.vertices[this.vertexIndex * 11 + 4]  = velocity[1];
-    this.vertices[this.vertexIndex * 11 + 5]  = 0.0;
-    this.vertices[this.vertexIndex * 11 + 6]  = red;
-    this.vertices[this.vertexIndex * 11 + 7]  = green;
-    this.vertices[this.vertexIndex * 11 + 8]  = blue;
-    this.vertices[this.vertexIndex * 11 + 9]  = 1.0;
-    this.vertices[this.vertexIndex * 11 + 10] = this.currentTime;
+    let arrayIndex = this.vertexIndex * (this.particleShader.vertexSize / Float32Array.BYTES_PER_ELEMENT);
+
+    this.vertices[arrayIndex++] = position[0];
+    this.vertices[arrayIndex++] = position[1];
+    this.vertices[arrayIndex++] = 0.0;
+    this.vertices[arrayIndex++] = velocity[0];
+    this.vertices[arrayIndex++] = velocity[1];
+    this.vertices[arrayIndex++] = 0.0;
+    this.vertices[arrayIndex++] = red;
+    this.vertices[arrayIndex++] = green;
+    this.vertices[arrayIndex++] = blue;
+    this.vertices[arrayIndex++] = 1.0;
+    this.vertices[arrayIndex++] = this.currentTime;
 
     renderer.fillVertexBuffer(this.vertexBuffer, this.vertices);
   }
