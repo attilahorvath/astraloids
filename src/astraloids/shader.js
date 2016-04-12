@@ -1,12 +1,18 @@
 'use strict';
 
 import VertexAttribute from './vertex_attribute';
+import MatrixVertexAttribute from './matrix_vertex_attribute';
+
+const mat4 = require('gl-matrix').mat4;
 
 const defaultVertexAttributes = [
-  new VertexAttribute('vertexPosition', 'FLOAT', 3)
+  new VertexAttribute('vertexPosition')
 ];
 
-const defaultUniforms = ['modelViewMatrix', 'projectionMatrix'];
+const defaultUniforms = [
+  new MatrixVertexAttribute('modelViewMatrix', 4),
+  new MatrixVertexAttribute('projectionMatrix', 4)
+];
 
 class Shader {
   constructor(renderer, vertexShaderSource, fragmentShaderSource, vertexAttributes = [], uniforms = []) {
@@ -49,8 +55,11 @@ class Shader {
     }
 
     for (let uniform of this.uniforms) {
-      this[uniform] = gl.getUniformLocation(this.shaderProgram, uniform);
+      this[uniform.name] = gl.getUniformLocation(this.shaderProgram, uniform.name);
     }
+
+    this.modelViewMatrixValue = mat4.create();
+    this.projectionMatrixValue = mat4.create();
   }
 
   setVertexAttributes(renderer) {
@@ -70,6 +79,10 @@ class Shader {
 
     for (let vertexAttribute of this.vertexAttributes) {
       gl.enableVertexAttribArray(this[vertexAttribute.name]);
+    }
+
+    for (let uniform of this.uniforms) {
+      uniform.setUniform(gl, this[uniform.name], this[`${uniform.name}Value`]);
     }
   }
 }

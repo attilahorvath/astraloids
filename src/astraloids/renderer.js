@@ -74,8 +74,8 @@ class Renderer {
     let modelViewMatrix = mat4.clone(this.camera.modelViewMatrix);
     mat4.multiply(modelViewMatrix, modelViewMatrix, transformationMatrix)
 
-    this.gl.uniformMatrix4fv(shader.modelViewMatrix, false, modelViewMatrix);
-    this.gl.uniformMatrix4fv(shader.projectionMatrix, false, this.projectionMatrix);
+    shader.modelViewMatrixValue = modelViewMatrix;
+    shader.projectionMatrixValue = this.projectionMatrix;
 
     this.gl.drawArrays(mode, 0, count);
   }

@@ -1,13 +1,13 @@
 'use strict';
 
-import vertexAttribute from '../vertex_attribute';
+import VertexAttribute from '../vertex_attribute';
 import Shader from '../shader';
 
 const vertexShaderSource = require('../../../shaders/simple.vert');
 const fragmentShaderSource = require('../../../shaders/simple.frag');
 
 const vertexAttributes = [
-  new vertexAttribute('vertexColor', 'FLOAT', 4)
+  new VertexAttribute('vertexColor', 4)
 ];
 
 class SimpleShader extends Shader {

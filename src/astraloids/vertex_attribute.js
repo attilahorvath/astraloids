@@ -1,10 +1,12 @@
 'use strict';
 
 class VertexAttribute {
-  constructor(name, elementType, elementCount) {
+  constructor(name, elementCount = 3, elementType = 'FLOAT') {
     this.name = name;
-    this.elementType = elementType;
     this.elementCount = elementCount;
+    this.elementType = elementType;
+
+    this.uniformMethod = `uniform${this.elementCount}${this.elementType === 'FLOAT' ? 'f' : 'i'}${this.elementCount > 1 ? 'v' : ''}`;
 
     switch (this.elementType) {
     case 'BYTE':
@@ -26,6 +28,10 @@ class VertexAttribute {
       this.byteCount = this.elementCount * Float32Array.BYTES_PER_ELEMENT;
       break;
     }
+  }
+
+  setUniform(gl, location, value) {
+    gl[this.uniformMethod](location, value);
   }
 }
 
