@@ -5,13 +5,17 @@ const vec2 = require('gl-matrix').vec2;
 const vec3 = require('gl-matrix').vec3;
 const vec4 = require('gl-matrix').vec4;
 
+const maxVertices = 1000;
+
 import Entity from '../entity';
 
 class ParticleEmitter extends Entity {
   constructor(game, x = 0.0, y = 0.0, angle = 0.0) {
     super(game, x, y, angle);
 
-    this.vertices = [];
+    this.vertices = new Float32Array(maxVertices * 11);
+    this.vertexCount = 0;
+    this.vertexIndex = 0;
 
     this.vertexBuffer = game.renderer.createVertexBuffer(this.vertices);
 
@@ -29,7 +33,25 @@ class ParticleEmitter extends Entity {
     let position = vec2.create();
     vec2.transformMat4(position, position, transformationMatrix);
 
-    this.vertices.push(position[0], position[1], 0.0, velocity[0], velocity[1], 0.0, red, green, blue, 1.0, this.currentTime);
+    this.vertexCount++;
+
+    if (this.vertexCount > maxVertices) {
+      this.vertexCount = maxVertices;
+    }
+
+    this.vertexIndex = (this.vertexIndex + 1) % maxVertices;
+
+    this.vertices[this.vertexIndex * 11]      = position[0];
+    this.vertices[this.vertexIndex * 11 + 1]  = position[1];
+    this.vertices[this.vertexIndex * 11 + 2]  = 0.0;
+    this.vertices[this.vertexIndex * 11 + 3]  = velocity[0];
+    this.vertices[this.vertexIndex * 11 + 4]  = velocity[1];
+    this.vertices[this.vertexIndex * 11 + 5]  = 0.0;
+    this.vertices[this.vertexIndex * 11 + 6]  = red;
+    this.vertices[this.vertexIndex * 11 + 7]  = green;
+    this.vertices[this.vertexIndex * 11 + 8]  = blue;
+    this.vertices[this.vertexIndex * 11 + 9]  = 1.0;
+    this.vertices[this.vertexIndex * 11 + 10] = this.currentTime;
 
     renderer.fillVertexBuffer(this.vertexBuffer, this.vertices);
   }
@@ -44,7 +66,7 @@ class ParticleEmitter extends Entity {
       this.particleShader.lifetimeValue = this.lifetime;
       this.particleShader.pointSizeValue = this.pointSize;
 
-      renderer.draw(this.particleShader, mat4.create(), this.vertexBuffer, renderer.gl.POINTS, this.vertices.length / 11);
+      renderer.draw(this.particleShader, mat4.create(), this.vertexBuffer, renderer.gl.POINTS, this.vertexCount);
     }
   }
 }
