@@ -1,22 +1,20 @@
 'use strict';
 
+import vertexAttribute from '../vertex_attribute';
+import Shader from '../shader';
+
 const vertexShaderSource = require('../../../shaders/point.vert');
 const fragmentShaderSource = require('../../../shaders/point.frag');
 
-import Shader from '../shader';
+const vertexAttributes = [
+  new vertexAttribute('vertexColor', 'FLOAT', 4)
+];
 
 class PointShader extends Shader {
   constructor(renderer) {
-    super(renderer, vertexShaderSource, fragmentShaderSource, ['vertexColor'], ['pointSize']);
+    super(renderer, vertexShaderSource, fragmentShaderSource, vertexAttributes, ['pointSize']);
 
     this.pointSizeValue = 1;
-  }
-
-  setVertexAttributes(renderer) {
-    const gl = renderer.gl;
-
-    gl.vertexAttribPointer(this.vertexPosition, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 7, 0);
-    gl.vertexAttribPointer(this.vertexColor, 4, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 7, Float32Array.BYTES_PER_ELEMENT * 3);
   }
 
   use(renderer) {

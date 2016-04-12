@@ -1,26 +1,24 @@
 'use strict';
 
+import VertexAttribute from '../vertex_attribute';
+import Shader from '../shader';
+
 const vertexShaderSource = require('../../../shaders/particle.vert');
 const fragmentShaderSource = require('../../../shaders/particle.frag');
 
-import Shader from '../shader';
+const vertexAttributes = [
+  new VertexAttribute('vertexVelocity', 'FLOAT', 3),
+  new VertexAttribute('vertexColor', 'FLOAT', 4),
+  new VertexAttribute('timestamp', 'FLOAT', 1)
+];
 
 class ParticleShader extends Shader {
   constructor(renderer) {
-    super(renderer, vertexShaderSource, fragmentShaderSource, ['vertexVelocity', 'vertexColor', 'timestamp'], ['currentTime', 'lifetime', 'pointSize']);
+    super(renderer, vertexShaderSource, fragmentShaderSource, vertexAttributes, ['currentTime', 'lifetime', 'pointSize']);
 
     this.currentTimeValue = 0;
     this.lifetimeValue = 100.0;
     this.pointSizeValue = 1.5;
-  }
-
-  setVertexAttributes(renderer) {
-    const gl = renderer.gl;
-
-    gl.vertexAttribPointer(this.vertexPosition, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 11, 0);
-    gl.vertexAttribPointer(this.vertexVelocity, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 11, Float32Array.BYTES_PER_ELEMENT * 3);
-    gl.vertexAttribPointer(this.vertexColor, 4, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 11, Float32Array.BYTES_PER_ELEMENT * 6);
-    gl.vertexAttribPointer(this.timestamp, 1, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 11, Float32Array.BYTES_PER_ELEMENT * 10);
   }
 
   use(renderer) {

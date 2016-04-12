@@ -1,13 +1,13 @@
 'use strict';
 
+import Entity from '../entity';
+
 const mat4 = require('gl-matrix').mat4;
 const vec2 = require('gl-matrix').vec2;
 const vec3 = require('gl-matrix').vec3;
 const vec4 = require('gl-matrix').vec4;
 
 const maxVertices = 1000;
-
-import Entity from '../entity';
 
 class ParticleEmitter extends Entity {
   constructor(game, x = 0.0, y = 0.0, angle = 0.0) {
@@ -61,7 +61,7 @@ class ParticleEmitter extends Entity {
   }
 
   draw(renderer, deltaTime, transformationMatrix = mat4.create()) {
-    if (this.vertices.length > 0) {
+    if (this.vertexCount > 0) {
       this.particleShader.currentTimeValue = this.currentTime;
       this.particleShader.lifetimeValue = this.lifetime;
       this.particleShader.pointSizeValue = this.pointSize;

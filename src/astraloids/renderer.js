@@ -1,16 +1,16 @@
 'use strict';
 
-const mat4 = require('gl-matrix').mat4;
-const vec4 = require('gl-matrix').vec4;
-
-const width = 1024;
-const height = 768;
-
 import SimpleShader from './shaders/simple_shader';
 import PointShader from './shaders/point_shader';
 import ParticleShader from './shaders/particle_shader';
 
 import Camera from './camera';
+
+const mat4 = require('gl-matrix').mat4;
+const vec4 = require('gl-matrix').vec4;
+
+const width = 1024;
+const height = 768;
 
 class Renderer {
   initialize() {

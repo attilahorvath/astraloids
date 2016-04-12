@@ -1,11 +1,11 @@
 'use strict';
 
+import Entity from '../entity';
+import ParticleEmitter from './particle_emitter';
+
 const mat2 = require('gl-matrix').mat2;
 const mat4 = require('gl-matrix').mat4;
 const vec2 = require('gl-matrix').vec2;
-
-import Entity from '../entity';
-import ParticleEmitter from './particle_emitter';
 
 class Ship extends Entity {
   constructor(game, x = 0.0, y = 0.0, angle = 0.0) {

@@ -1,8 +1,8 @@
 'use strict';
 
-const mat4 = require('gl-matrix').mat4;
-
 import Entity from '../entity';
+
+const mat4 = require('gl-matrix').mat4;
 
 class BackgroundLayer extends Entity {
   constructor(game, stars = 500, pointSize = 1.0, relativeVelocity = 1.0, x = 0.0, y = 0.0, angle = 0.0) {

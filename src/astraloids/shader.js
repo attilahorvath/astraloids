@@ -1,6 +1,11 @@
 'use strict';
 
-const defaultVertexAttributes = ['vertexPosition'];
+import VertexAttribute from './vertex_attribute';
+
+const defaultVertexAttributes = [
+  new VertexAttribute('vertexPosition', 'FLOAT', 3)
+];
+
 const defaultUniforms = ['modelViewMatrix', 'projectionMatrix'];
 
 class Shader {
@@ -35,8 +40,12 @@ class Shader {
       alert(gl.getProgramInfoLog(this.shaderProgram));
     }
 
+    this.vertexSize = 0;
+
     for (let vertexAttribute of this.vertexAttributes) {
-      this[vertexAttribute] = gl.getAttribLocation(this.shaderProgram, vertexAttribute);
+      this[vertexAttribute.name] = gl.getAttribLocation(this.shaderProgram, vertexAttribute.name);
+
+      this.vertexSize += vertexAttribute.byteCount;
     }
 
     for (let uniform of this.uniforms) {
@@ -44,7 +53,15 @@ class Shader {
     }
   }
 
-  setVertexAttributes(renderer) {}
+  setVertexAttributes(renderer) {
+    let offset = 0;
+
+    for (let vertexAttribute of this.vertexAttributes) {
+      renderer.gl.vertexAttribPointer(this[vertexAttribute.name], vertexAttribute.elementCount, renderer.gl[vertexAttribute.elementType], false, this.vertexSize, offset);
+
+      offset += vertexAttribute.byteCount;
+    }
+  }
 
   use(renderer) {
     const gl = renderer.gl;
@@ -52,7 +69,7 @@ class Shader {
     gl.useProgram(this.shaderProgram);
 
     for (let vertexAttribute of this.vertexAttributes) {
-      gl.enableVertexAttribArray(this[vertexAttribute]);
+      gl.enableVertexAttribArray(this[vertexAttribute.name]);
     }
   }
 }
