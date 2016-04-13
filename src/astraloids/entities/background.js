@@ -12,14 +12,39 @@ class Background extends Entity {
     this.shipX = game.ship.x;
     this.shipY = game.ship.y;
 
+    this.deltaShipX = 0;
+    this.deltaShipY = 0;
+
     this.children.push(new BackgroundLayer(game, 500, 1.0, 0.0, x, y, angle));
-    this.children.push(new BackgroundLayer(game, 500, 1.5, 0.5, x, y, angle));
-    this.children.push(new BackgroundLayer(game, 500, 2.0, 1.0, x, y, angle));
+    this.children.push(new BackgroundLayer(game, 500, 1.5, 1.0, x, y, angle));
+    this.children.push(new BackgroundLayer(game, 500, 2.0, 2.0, x, y, angle));
   }
 
   update(game, deltaTime, transformationMatrix = mat4.create()) {
+    this.deltaShipX = game.ship.x - this.shipX;
+    this.deltaShipY = game.ship.y - this.shipY;
+
     this.shipX = game.ship.x;
     this.shipY = game.ship.y;
+
+    for (let layer of this.children) {
+      layer.x -= this.deltaShipX * layer.relativeVelocity;
+      layer.y -= this.deltaShipY * layer.relativeVelocity;
+
+      if (layer.x - game.renderer.canvas.width / 2 > game.ship.x) {
+        layer.x -= game.renderer.canvas.width;
+      } else if (layer.x + game.renderer.canvas.width / 2 < game.ship.x) {
+        layer.x += game.renderer.canvas.width;
+      }
+
+      if (layer.y - game.renderer.canvas.height / 2 > game.ship.y) {
+        layer.y -= game.renderer.canvas.height;
+      } else if (layer.y + game.renderer.canvas.height / 2 < game.ship.y) {
+        layer.y += game.renderer.canvas.height;
+      }
+
+      layer.calculateTransformationMatrix();
+    }
   }
 
   drawAll(renderer, deltaTime, transformationMatrix = mat4.create()) {
@@ -29,16 +54,9 @@ class Background extends Entity {
     // TODO Refactor
 
     for (let layer of this.children) {
-      let offsetX = (this.shipX % renderer.canvas.width) * layer.relativeVelocity;
-      let offsetY = (this.shipY % renderer.canvas.height) * layer.relativeVelocity;
+      let layerX = layer.x;
+      let layerY = layer.y;
 
-      let layerX = Math.floor((this.shipX + offsetX + renderer.canvas.width / 2) / renderer.canvas.width) * renderer.canvas.width - offsetX;
-      let layerY = Math.floor((this.shipY + offsetY + renderer.canvas.height / 2) / renderer.canvas.height) * renderer.canvas.height - offsetY;
-
-      layer.x = layerX;
-      layer.y = layerY;
-
-      layer.calculateTransformationMatrix();
       layer.drawAll(renderer, deltaTime, transformationMatrix);
 
       if (this.shipX <= layer.x) {
@@ -48,6 +66,7 @@ class Background extends Entity {
       }
 
       layer.calculateTransformationMatrix();
+
       layer.drawAll(renderer, deltaTime, transformationMatrix);
 
       layer.x = layerX;
@@ -59,6 +78,7 @@ class Background extends Entity {
       }
 
       layer.calculateTransformationMatrix();
+
       layer.drawAll(renderer, deltaTime, transformationMatrix);
 
       layer.y = layerY;
@@ -80,7 +100,13 @@ class Background extends Entity {
       }
 
       layer.calculateTransformationMatrix();
+
       layer.drawAll(renderer, deltaTime, transformationMatrix);
+
+      layer.x = layerX;
+      layer.y = layerY;
+
+      layer.calculateTransformationMatrix();
     }
   }
 }

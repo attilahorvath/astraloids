@@ -63,19 +63,17 @@ class Renderer {
   }
 
   draw(shader, transformationMatrix, vertexBuffer, mode, count) {
-    if (this.lastShader !== shader) {
-      shader.use(this);
-    }
-
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertexBuffer);
 
     shader.setVertexAttributes(this);
 
     let modelViewMatrix = mat4.clone(this.camera.modelViewMatrix);
-    mat4.multiply(modelViewMatrix, modelViewMatrix, transformationMatrix)
+    mat4.multiply(modelViewMatrix, modelViewMatrix, transformationMatrix);
 
     shader.modelViewMatrixValue = modelViewMatrix;
     shader.projectionMatrixValue = this.projectionMatrix;
+
+    shader.use(this);
 
     this.gl.drawArrays(mode, 0, count);
   }
