@@ -3,6 +3,7 @@
 import SimpleShader from './shaders/simple_shader';
 import PointShader from './shaders/point_shader';
 import ParticleShader from './shaders/particle_shader';
+import TextureShader from './shaders/texture_shader';
 
 import Camera from './camera';
 
@@ -36,7 +37,8 @@ class Renderer {
     this.shaders = {
       simpleShader: new SimpleShader(this),
       pointShader: new PointShader(this),
-      particleShader: new ParticleShader(this)
+      particleShader: new ParticleShader(this),
+      textureShader: new TextureShader(this)
     };
 
     this.lastShader = null;
@@ -62,7 +64,7 @@ class Renderer {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
   }
 
-  draw(shader, transformationMatrix, vertexBuffer, mode, count) {
+  draw(shader, transformationMatrix, vertexBuffer, mode, count, skipCamera = false) {
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertexBuffer);
 
     shader.setVertexAttributes(this);
@@ -70,8 +72,8 @@ class Renderer {
     let modelViewMatrix = mat4.clone(this.camera.modelViewMatrix);
     mat4.multiply(modelViewMatrix, modelViewMatrix, transformationMatrix);
 
-    shader.modelViewMatrixValue = modelViewMatrix;
-    shader.projectionMatrixValue = this.projectionMatrix;
+    shader.modelViewMatrixValue = skipCamera ? mat4.create() : modelViewMatrix;
+    shader.projectionMatrixValue = skipCamera ? mat4.create() : this.projectionMatrix;
 
     shader.use(this);
 
