@@ -40,9 +40,11 @@ class Game {
       entity.updateAll(this, deltaTime);
     }
 
-    this.blurIntensity += deltaTime * 0.01;
+    this.blurIntensity += deltaTime * 0.001;
 
     this.renderer.camera.setPosition(this.renderer.canvas.width / 2 - this.ship.x, this.renderer.canvas.height / 2 - this.ship.y);
+
+    this.renderer.gl.viewport(0, 0, 320, 240);
 
     this.renderer.postProcessor.begin();
 
@@ -54,13 +56,17 @@ class Game {
 
     this.renderer.clear();
 
+    this.renderer.gl.viewport(0, 0, this.renderer.canvas.width, this.renderer.canvas.height);
+
     for (let entity of this.entities) {
       entity.drawAll(this.renderer, deltaTime);
     }
 
+    this.renderer.gl.viewport(0, 0, 320, 240);
+
     this.renderer.postProcessor.process(this.renderer.shaders.thresholdShader);
 
-    this.renderer.shaders.blurShader.intensityValue = Math.sin(this.blurIntensity) * 5.0;
+    this.renderer.shaders.blurShader.intensityValue = Math.sin(this.blurIntensity) * 1.0;
 
     this.renderer.shaders.blurShader.directionValue = [1.0, 0.0];
     this.renderer.postProcessor.process(this.renderer.shaders.blurShader);
@@ -69,6 +75,8 @@ class Game {
     this.renderer.postProcessor.process(this.renderer.shaders.blurShader);
 
     this.renderer.gl.blendFunc(this.renderer.gl.SRC_ALPHA, this.renderer.gl.ONE);
+
+    this.renderer.gl.viewport(0, 0, this.renderer.canvas.width, this.renderer.canvas.height);
 
     this.renderer.postProcessor.draw(this.renderer.shaders.textureShader);
 

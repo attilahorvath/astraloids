@@ -17,7 +17,7 @@ class Background extends Entity {
 
     this.children.push(new BackgroundLayer(game, 500, 1.0, 0.0, x, y, angle));
     this.children.push(new BackgroundLayer(game, 500, 1.5, 1.0, x, y, angle));
-    this.children.push(new BackgroundLayer(game, 500, 5.0, 2.0, x, y, angle));
+    this.children.push(new BackgroundLayer(game, 500, 2.0, 2.0, x, y, angle));
   }
 
   update(game, deltaTime, transformationMatrix = mat4.create()) {

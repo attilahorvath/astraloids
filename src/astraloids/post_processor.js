@@ -39,7 +39,7 @@ class PostProcessor {
     this.renderer.gl.texParameteri(this.renderer.gl.TEXTURE_2D, this.renderer.gl.TEXTURE_WRAP_S, this.renderer.gl.CLAMP_TO_EDGE);
     this.renderer.gl.texParameteri(this.renderer.gl.TEXTURE_2D, this.renderer.gl.TEXTURE_WRAP_T, this.renderer.gl.CLAMP_TO_EDGE);
 
-    this.renderer.gl.texImage2D(this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA, this.renderer.canvas.width, this.renderer.canvas.height, 0, this.renderer.gl.RGBA, this.renderer.gl.UNSIGNED_BYTE, null);
+    this.renderer.gl.texImage2D(this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA, 320, 240, 0, this.renderer.gl.RGBA, this.renderer.gl.UNSIGNED_BYTE, null);
 
     return texture;
   }

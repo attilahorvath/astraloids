@@ -22,7 +22,7 @@ class BlurShader extends Shader {
     super(renderer, vertexShaderSource, fragmentShaderSource, vertexAttributes, uniforms);
 
     this.samplerValue = 0;
-    this.textureSizeValue = [renderer.canvas.width, renderer.canvas.height];
+    this.textureSizeValue = [320, 240];
     this.directionValue = [1.0, 0.0];
     this.intensityValue = 5.0;
   }
