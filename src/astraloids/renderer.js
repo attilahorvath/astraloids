@@ -4,8 +4,12 @@ import SimpleShader from './shaders/simple_shader';
 import PointShader from './shaders/point_shader';
 import ParticleShader from './shaders/particle_shader';
 import TextureShader from './shaders/texture_shader';
+import DesaturateShader from './shaders/desaturate_shader';
+import BlurShader from './shaders/blur_shader';
+import ThresholdShader from './shaders/threshold_shader';
 
 import Camera from './camera';
+import PostProcessor from './post_processor';
 
 const mat4 = require('gl-matrix').mat4;
 const vec4 = require('gl-matrix').vec4;
@@ -38,12 +42,17 @@ class Renderer {
       simpleShader: new SimpleShader(this),
       pointShader: new PointShader(this),
       particleShader: new ParticleShader(this),
-      textureShader: new TextureShader(this)
+      textureShader: new TextureShader(this),
+      desaturateShader: new DesaturateShader(this),
+      blurShader: new BlurShader(this),
+      thresholdShader: new ThresholdShader(this)
     };
 
     this.lastShader = null;
 
     this.camera = new Camera(this.canvas.width / 2, this.canvas.height / 2);
+
+    this.postProcessor = new PostProcessor(this);
   }
 
   createVertexBuffer(vertices) {

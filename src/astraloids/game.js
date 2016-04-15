@@ -1,14 +1,11 @@
 'use strict';
 
-const mat4 = require('gl-matrix').mat4;
-
 import KeyboardInput from './keyboard_input';
 
 import Renderer from './renderer';
 
 import Background from './entities/background';
 import Ship from './entities/ship';
-import ParticleEmitter from './entities/particle_emitter';
 
 class Game {
   constructor() {
@@ -22,42 +19,12 @@ class Game {
   run() {
     this.renderer.initialize();
 
-    this.texture = this.renderer.gl.createTexture();
-
-    this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.texture);
-
-    this.renderer.gl.texParameteri(this.renderer.gl.TEXTURE_2D, this.renderer.gl.TEXTURE_MIN_FILTER, this.renderer.gl.LINEAR);
-    this.renderer.gl.texParameteri(this.renderer.gl.TEXTURE_2D, this.renderer.gl.TEXTURE_WRAP_S, this.renderer.gl.CLAMP_TO_EDGE);
-    this.renderer.gl.texParameteri(this.renderer.gl.TEXTURE_2D, this.renderer.gl.TEXTURE_WRAP_T, this.renderer.gl.CLAMP_TO_EDGE);
-
-    this.renderer.gl.texImage2D(this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA, this.renderer.canvas.width, this.renderer.canvas.height, 0, this.renderer.gl.RGBA, this.renderer.gl.UNSIGNED_BYTE, null);
-
-    this.framebuffer = this.renderer.gl.createFramebuffer();
-
-    this.renderer.gl.bindFramebuffer(this.renderer.gl.FRAMEBUFFER, this.framebuffer);
-
-    this.renderer.gl.framebufferTexture2D(this.renderer.gl.FRAMEBUFFER, this.renderer.gl.COLOR_ATTACHMENT0, this.renderer.gl.TEXTURE_2D, this.texture, 0);
-
-    this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
-    this.renderer.gl.bindFramebuffer(this.renderer.gl.FRAMEBUFFER, null);
-
-    const vertices = [
-       1,  1, 0, 1, 1,
-      -1,  1, 0, 0, 1,
-      -1, -1, 0, 0, 0,
-       1,  1, 0, 1, 1,
-      -1, -1, 0, 0, 0,
-       1, -1, 0, 1, 0
-    ];
-
-    this.vertexBuffer = this.renderer.createVertexBuffer(vertices);
-
     this.ship = new Ship(this);
+
+    this.blurIntensity = 0.0;
 
     this.entities.push(new Background(this));
     this.entities.push(this.ship);
-    this.entities.push(new ParticleEmitter(this));
-    this.entities.push(new ParticleEmitter(this, -300, -300));
 
     this.lastTime = Date.now();
 
@@ -73,9 +40,17 @@ class Game {
       entity.updateAll(this, deltaTime);
     }
 
+    this.blurIntensity += deltaTime * 0.01;
+
     this.renderer.camera.setPosition(this.renderer.canvas.width / 2 - this.ship.x, this.renderer.canvas.height / 2 - this.ship.y);
 
-    this.renderer.gl.bindFramebuffer(this.renderer.gl.FRAMEBUFFER, this.framebuffer);
+    this.renderer.postProcessor.begin();
+
+    for (let entity of this.entities) {
+      entity.drawAll(this.renderer, deltaTime);
+    }
+
+    this.renderer.postProcessor.end();
 
     this.renderer.clear();
 
@@ -83,16 +58,21 @@ class Game {
       entity.drawAll(this.renderer, deltaTime);
     }
 
-    this.renderer.gl.bindFramebuffer(this.renderer.gl.FRAMEBUFFER, null);
+    this.renderer.postProcessor.process(this.renderer.shaders.thresholdShader);
 
-    this.renderer.clear();
+    this.renderer.shaders.blurShader.intensityValue = Math.sin(this.blurIntensity) * 5.0;
 
-    this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
-    this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.texture);
+    this.renderer.shaders.blurShader.directionValue = [1.0, 0.0];
+    this.renderer.postProcessor.process(this.renderer.shaders.blurShader);
 
-    this.renderer.draw(this.renderer.shaders.textureShader, mat4.create(), this.vertexBuffer, this.renderer.gl.TRIANGLES, 6, true);
+    this.renderer.shaders.blurShader.directionValue = [0.0, 1.0];
+    this.renderer.postProcessor.process(this.renderer.shaders.blurShader);
 
-    this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+    this.renderer.gl.blendFunc(this.renderer.gl.SRC_ALPHA, this.renderer.gl.ONE);
+
+    this.renderer.postProcessor.draw(this.renderer.shaders.textureShader);
+
+    this.renderer.gl.blendFunc(this.renderer.gl.SRC_ALPHA, this.renderer.gl.ONE_MINUS_SRC_ALPHA);
 
     this.lastTime = currentTime;
   }
