@@ -14,7 +14,7 @@ const uniforms = [
   new VertexAttribute('sampler', 1, 'UNSIGNED_BYTE'),
   new VertexAttribute('textureSize', 2),
   new VertexAttribute('direction', 2),
-  new VertexAttribute('intensity', 1)
+  new VertexAttribute('radius', 1)
 ];
 
 class BlurShader extends Shader {
@@ -22,9 +22,9 @@ class BlurShader extends Shader {
     super(renderer, vertexShaderSource, fragmentShaderSource, vertexAttributes, uniforms);
 
     this.samplerValue = 0;
-    this.textureSizeValue = [320, 240];
+    this.textureSizeValue = [renderer.canvas.width, renderer.canvas.height];
     this.directionValue = [1.0, 0.0];
-    this.intensityValue = 5.0;
+    this.radiusValue = 1.0;
   }
 }
 

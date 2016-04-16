@@ -69,6 +69,10 @@ class Renderer {
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertices), this.gl.STATIC_DRAW);
   }
 
+  setSize(width, height) {
+    this.gl.viewport(0, 0, width, height);
+  }
+
   clear() {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
   }
