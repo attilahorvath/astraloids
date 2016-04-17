@@ -6,11 +6,13 @@ import BackgroundLayer from './background_layer';
 const mat4 = require('gl-matrix').mat4;
 
 class Background extends Entity {
-  constructor(game, x = 0.0, y = 0.0, angle = 0.0) {
+  constructor(game, ship, x = 0.0, y = 0.0, angle = 0.0) {
     super(game, x, y, angle);
 
-    this.shipX = game.ship.x;
-    this.shipY = game.ship.y;
+    this.ship = ship;
+
+    this.shipX = this.ship.x;
+    this.shipY = this.ship.y;
 
     this.deltaShipX = 0;
     this.deltaShipY = 0;
@@ -21,25 +23,25 @@ class Background extends Entity {
   }
 
   update(game, deltaTime, transformationMatrix = mat4.create()) {
-    this.deltaShipX = game.ship.x - this.shipX;
-    this.deltaShipY = game.ship.y - this.shipY;
+    this.deltaShipX = this.ship.x - this.shipX;
+    this.deltaShipY = this.ship.y - this.shipY;
 
-    this.shipX = game.ship.x;
-    this.shipY = game.ship.y;
+    this.shipX = this.ship.x;
+    this.shipY = this.ship.y;
 
     for (let layer of this.children) {
       layer.x -= this.deltaShipX * layer.relativeVelocity;
       layer.y -= this.deltaShipY * layer.relativeVelocity;
 
-      if (layer.x - game.renderer.canvas.width / 2 > game.ship.x) {
+      if (layer.x - game.renderer.canvas.width / 2 > this.ship.x) {
         layer.x -= game.renderer.canvas.width;
-      } else if (layer.x + game.renderer.canvas.width / 2 < game.ship.x) {
+      } else if (layer.x + game.renderer.canvas.width / 2 < this.ship.x) {
         layer.x += game.renderer.canvas.width;
       }
 
-      if (layer.y - game.renderer.canvas.height / 2 > game.ship.y) {
+      if (layer.y - game.renderer.canvas.height / 2 > this.ship.y) {
         layer.y -= game.renderer.canvas.height;
-      } else if (layer.y + game.renderer.canvas.height / 2 < game.ship.y) {
+      } else if (layer.y + game.renderer.canvas.height / 2 < this.ship.y) {
         layer.y += game.renderer.canvas.height;
       }
 

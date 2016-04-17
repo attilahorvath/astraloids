@@ -53,15 +53,20 @@ class Ship extends Entity {
 
   update(game, deltaTime, transformationMatrix = mat4.create()) {
     let accelerationSize = 0.0;
+
+    let accelerating = false;
+    let decelerating = false;
     let steeringLeft = false;
     let steeringRight = false;
 
     if (game.keyboardInput.keysDown[87] || game.keyboardInput.keysDown[38]) {
-      accelerationSize = 0.001;
+      accelerationSize += 0.001;
+      accelerating = true;
     }
 
     if (game.keyboardInput.keysDown[83] || game.keyboardInput.keysDown[40]) {
-      accelerationSize = -0.0002;
+      accelerationSize -= 0.0002;
+      decelerating = true;
     }
 
     if (game.keyboardInput.keysDown[65] || game.keyboardInput.keysDown[37]) {
@@ -92,9 +97,11 @@ class Ship extends Entity {
 
     this.calculateTransformationMatrix();
 
-    if (accelerationSize > 0.0) {
+    if (accelerating) {
       this.thruster.emitParticle(game.renderer, vec2.create(), transformationMatrix, 0.5 + Math.random() * 0.5, 0, 0);
-    } else if (accelerationSize < 0.0) {
+    }
+
+    if (decelerating) {
       this.emitSteeringParticles(this.frontLeftSteerer, game.renderer, 10, 0.0, -1.0, transformationMatrix);
       this.emitSteeringParticles(this.frontRightSteerer, game.renderer, 10, 0.0, -1.0, transformationMatrix);
     }
