@@ -11,8 +11,8 @@ class MatrixVertexAttribute extends VertexAttribute {
     this.uniformMethod = `uniformMatrix${this.size}fv`;
   }
 
-  setUniform(gl, location, value) {
-    gl.uniformMatrix4fv(location, false, value);
+  setUniformValue(gl, location, value) {
+    gl[this.uniformMethod](location, false, value);
   }
 }
 

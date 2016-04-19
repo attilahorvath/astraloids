@@ -48,7 +48,14 @@ class Renderer {
       thresholdShader: new ThresholdShader(this)
     };
 
-    this.lastShader = null;
+    this.viewportWidth = width;
+    this.viewportHeight = height;
+
+    this.lastVertexBuffer = null;
+    this.lastShaderProgram = null;
+
+    this.enabledVertexAttributeArrays = {};
+    this.uniformValues = new Map();
 
     this.camera = new Camera(this.canvas.width / 2, this.canvas.height / 2);
 
@@ -70,15 +77,48 @@ class Renderer {
   }
 
   setSize(width, height) {
-    this.gl.viewport(0, 0, width, height);
+    if (width !== this.viewportWidth || height !== this.viewportHeight) {
+      this.gl.viewport(0, 0, width, height);
+
+      this.viewportWidth = width;
+      this.viewportHeight = height;
+    }
   }
 
   clear() {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
   }
 
+  useShaderProgram(shaderProgram) {
+    if (shaderProgram !== this.lastShaderProgram) {
+      this.gl.useProgram(shaderProgram);
+
+      this.lastShaderProgram = shaderProgram;
+    }
+  }
+
+  enableVertexAttributeArray(index) {
+    if (!this.enabledVertexAttributeArrays[index]) {
+      this.gl.enableVertexAttribArray(index);
+
+      this.enabledVertexAttributeArrays[index] = true;
+    }
+  }
+
+  setUniformValue(vertexAttribute, location, value) {
+    if (this.uniformValues.get(location) !== value) {
+      vertexAttribute.setUniformValue(this.gl, location, value);
+
+      this.uniformValues.set(location, value);
+    }
+  }
+
   draw(shader, transformationMatrix, vertexBuffer, mode, count, skipCamera = false) {
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertexBuffer);
+    if (vertexBuffer !== this.lastVertexBuffer) {
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertexBuffer);
+
+      this.lastVertexBuffer = vertexBuffer;
+    }
 
     shader.setVertexAttributes(this);
 

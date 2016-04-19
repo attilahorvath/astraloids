@@ -95,7 +95,6 @@ class PostProcessor {
       this.renderer.setSize(this.renderer.canvas.width / downscaleFactor, this.renderer.canvas.height / downscaleFactor);
     }
 
-    this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
     this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, (this.downscaled ? this.downscaledTextures : this.textures)[this.lastFramebuffer]);
 
     this.renderer.draw(shader, mat4.create(), this.vertexBuffer, this.renderer.gl.TRIANGLES, 6, true);
@@ -111,7 +110,6 @@ class PostProcessor {
   }
 
   draw(shader, additiveBlend = false) {
-    this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
     this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, (this.downscaled ? this.downscaledTextures : this.textures)[this.lastFramebuffer]);
 
     this.renderer.setSize(this.renderer.canvas.width, this.renderer.canvas.height);

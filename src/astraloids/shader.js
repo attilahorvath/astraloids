@@ -73,16 +73,14 @@ class Shader {
   }
 
   use(renderer) {
-    const gl = renderer.gl;
-
-    gl.useProgram(this.shaderProgram);
+    renderer.useShaderProgram(this.shaderProgram);
 
     for (let vertexAttribute of this.vertexAttributes) {
-      gl.enableVertexAttribArray(this[vertexAttribute.name]);
+      renderer.enableVertexAttributeArray(this[vertexAttribute.name]);
     }
 
     for (let uniform of this.uniforms) {
-      uniform.setUniform(gl, this[uniform.name], this[`${uniform.name}Value`]);
+      renderer.setUniformValue(uniform, this[uniform.name], this[`${uniform.name}Value`]);
     }
   }
 }

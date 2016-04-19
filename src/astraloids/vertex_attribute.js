@@ -30,7 +30,7 @@ class VertexAttribute {
     }
   }
 
-  setUniform(gl, location, value) {
+  setUniformValue(gl, location, value) {
     gl[this.uniformMethod](location, value);
   }
 }
