@@ -12,9 +12,6 @@ class Game {
   run(gameState) {
     this.gameState = gameState;
 
-    this.renderer.initialize();
-    this.gameState.initialize();
-
     this.lastTime = Date.now();
 
     requestAnimationFrame(() => this.loop());
@@ -28,13 +25,7 @@ class Game {
     this.gameState.update(deltaTime);
     this.gameState.draw(deltaTime);
 
-    if (this.gameState.nextState !== this.gameState) {
-      let nextState = this.gameState.nextState;
-
-      this.gameState.cleanup();
-      this.gameState = nextState;
-      this.gameState.initialize();
-    }
+    this.gameState = this.gameState.nextState;
 
     this.lastTime = currentTime;
   }

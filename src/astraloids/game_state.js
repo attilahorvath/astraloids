@@ -10,10 +10,6 @@ class GameState {
     this.nextState = this;
   }
 
-  initialize() {}
-
-  cleanup() {}
-
   update(deltaTime) {
     for (let entity of this.entities) {
       entity.updateAll(this.game, deltaTime);

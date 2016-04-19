@@ -6,7 +6,9 @@ import Background from '../entities/background';
 import Ship from '../entities/ship';
 
 class MainState extends GameState {
-  initialize() {
+  constructor(game) {
+    super(game);
+
     this.ship = new Ship(this.game);
 
     this.entities.push(new Background(this.game, this.ship));

@@ -18,7 +18,7 @@ const width = 1024;
 const height = 768;
 
 class Renderer {
-  initialize() {
+  constructor() {
     this.canvas = document.createElement('canvas');
 
     this.canvas.width = width;
