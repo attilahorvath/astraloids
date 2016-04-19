@@ -72,7 +72,12 @@ class Renderer {
   }
 
   fillVertexBuffer(vertexBuffer, vertices) {
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertexBuffer);
+    if (vertexBuffer !== this.lastVertexBuffer) {
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertexBuffer);
+
+      this.lastVertexBuffer = vertexBuffer;
+    }
+
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertices), this.gl.STATIC_DRAW);
   }
 
