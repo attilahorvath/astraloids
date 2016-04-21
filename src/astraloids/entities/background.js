@@ -17,9 +17,9 @@ class Background extends Entity {
     this.deltaShipX = 0;
     this.deltaShipY = 0;
 
-    this.children.push(new BackgroundLayer(game, 500, 1.0, 0.0, x, y, angle));
-    this.children.push(new BackgroundLayer(game, 500, 1.5, 1.0, x, y, angle));
-    this.children.push(new BackgroundLayer(game, 500, 2.0, 2.0, x, y, angle));
+    this.children.push(new BackgroundLayer(game, 500, 1.0, 1.0, x, y, angle));
+    this.children.push(new BackgroundLayer(game, 500, 1.5, 2.0, x, y, angle));
+    this.children.push(new BackgroundLayer(game, 500, 2.0, 3.0, x, y, angle));
   }
 
   update(game, deltaTime, transformationMatrix = mat4.create()) {
@@ -30,8 +30,8 @@ class Background extends Entity {
     this.shipY = this.ship.y;
 
     for (let layer of this.children) {
-      layer.x -= this.deltaShipX * layer.relativeVelocity;
-      layer.y -= this.deltaShipY * layer.relativeVelocity;
+      layer.x -= this.deltaShipX / layer.relativeVelocity;
+      layer.y -= this.deltaShipY / layer.relativeVelocity;
 
       if (layer.x - game.renderer.canvas.width / 2 > this.ship.x) {
         layer.x -= game.renderer.canvas.width;

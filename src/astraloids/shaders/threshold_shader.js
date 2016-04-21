@@ -20,7 +20,7 @@ class ThresholdShader extends Shader {
     super(renderer, vertexShaderSource, fragmentShaderSource, vertexAttributes, uniforms);
 
     this.samplerValue = 0;
-    this.thresholdValue = 0.5;
+    this.thresholdValue = 0.7;
   }
 }
 

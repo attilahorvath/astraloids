@@ -4,6 +4,7 @@ import GameState from '../game_state';
 
 import Background from '../entities/background';
 import Ship from '../entities/ship';
+import Asteroid from '../entities/asteroid';
 
 class MainState extends GameState {
   constructor(game) {
@@ -12,6 +13,11 @@ class MainState extends GameState {
     this.ship = new Ship(this.game);
 
     this.entities.push(new Background(this.game, this.ship));
+
+    for (let i = 0; i < 10; i++) {
+      this.entities.push(new Asteroid(this.game, -this.renderer.canvas.width / 2 + Math.random() * this.renderer.canvas.width, -this.renderer.canvas.height / 2 + Math.random() * this.renderer.canvas.height));
+    }
+
     this.entities.push(this.ship);
   }
 
