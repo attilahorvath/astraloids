@@ -1,6 +1,7 @@
 'use strict';
 
 import Entity from '../entity';
+import Particle from '../particle';
 
 const mat4 = require('gl-matrix').mat4;
 const vec2 = require('gl-matrix').vec2;
@@ -27,33 +28,39 @@ class ParticleEmitter extends Entity {
   }
 
   emitParticle(renderer, velocity, transformationMatrix = mat4.create(), red = Math.random(), green = Math.random(), blue = Math.random()) {
+    this.emitParticles(renderer, [new Particle(velocity, red, green, blue)], transformationMatrix);
+  }
+
+  emitParticles(renderer, particles, transformationMatrix = mat4.create()) {
     transformationMatrix = mat4.clone(transformationMatrix);
     mat4.multiply(transformationMatrix, transformationMatrix, this.transformationMatrix);
 
-    let position = vec2.create();
-    vec2.transformMat4(position, position, transformationMatrix);
-
-    this.vertexCount++;
+    this.vertexCount += particles.length;
 
     if (this.vertexCount > maxVertices) {
       this.vertexCount = maxVertices;
     }
 
-    this.vertexIndex = (this.vertexIndex + 1) % maxVertices;
+    for (let particle of particles) {
+      let position = vec2.create();
+      vec2.transformMat4(position, position, transformationMatrix);
 
-    let arrayIndex = this.vertexIndex * (this.particleShader.vertexSize / Float32Array.BYTES_PER_ELEMENT);
+      this.vertexIndex = (++this.vertexIndex) % maxVertices;
 
-    this.vertices[arrayIndex++] = position[0];
-    this.vertices[arrayIndex++] = position[1];
-    this.vertices[arrayIndex++] = 0.0;
-    this.vertices[arrayIndex++] = velocity[0];
-    this.vertices[arrayIndex++] = velocity[1];
-    this.vertices[arrayIndex++] = 0.0;
-    this.vertices[arrayIndex++] = red;
-    this.vertices[arrayIndex++] = green;
-    this.vertices[arrayIndex++] = blue;
-    this.vertices[arrayIndex++] = 1.0;
-    this.vertices[arrayIndex++] = this.currentTime;
+      let arrayIndex = this.vertexIndex * (this.particleShader.vertexSize / Float32Array.BYTES_PER_ELEMENT);
+
+      this.vertices[arrayIndex++] = position[0];
+      this.vertices[arrayIndex++] = position[1];
+      this.vertices[arrayIndex++] = 0.0;
+      this.vertices[arrayIndex++] = particle.velocity[0];
+      this.vertices[arrayIndex++] = particle.velocity[1];
+      this.vertices[arrayIndex++] = 0.0;
+      this.vertices[arrayIndex++] = particle.red;
+      this.vertices[arrayIndex++] = particle.green;
+      this.vertices[arrayIndex++] = particle.blue;
+      this.vertices[arrayIndex++] = 1.0;
+      this.vertices[arrayIndex++] = this.currentTime;
+    }
 
     renderer.fillVertexBuffer(this.vertexBuffer, this.vertices);
   }

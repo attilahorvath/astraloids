@@ -1,6 +1,7 @@
 'use strict';
 
 import Entity from '../entity';
+import Particle from '../particle';
 import ParticleEmitter from './particle_emitter';
 
 const mat2 = require('gl-matrix').mat2;
@@ -122,16 +123,22 @@ class Ship extends Entity {
   }
 
   emitSteeringParticles(emitter, renderer, count, velocityX, velocityY, transformationMatrix) {
+    let particles = [];
+
     for (let i = 0; i < count; i++) {
       let particleVelocityX = velocityX === 0 ? -0.05 + Math.random() * 0.1 : (0.2 + Math.random() * 0.2) * velocityX;
       let particleVelocityY = velocityY === 0 ? -0.05 + Math.random() * 0.1 : (0.2 + Math.random() * 0.2) * velocityY;
       let particleVelocity = vec2.fromValues(particleVelocityX, particleVelocityY);
       let rotationMatrix = mat2.create();
+
       mat2.rotate(rotationMatrix, rotationMatrix, this.angle);
       vec2.transformMat2(particleVelocity, particleVelocity, rotationMatrix);
       vec2.add(particleVelocity, particleVelocity, this.velocity);
-      emitter.emitParticle(renderer, particleVelocity, transformationMatrix, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5);
+
+      particles.push(new Particle(particleVelocity, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5));
     }
+
+    emitter.emitParticles(renderer, particles, transformationMatrix);
   }
 }
 
