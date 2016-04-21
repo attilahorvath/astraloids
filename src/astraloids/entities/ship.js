@@ -3,6 +3,7 @@
 import Entity from '../entity';
 import Particle from '../particle';
 import ParticleEmitter from './particle_emitter';
+import Projectile from './projectile';
 
 const mat2 = require('gl-matrix').mat2;
 const mat4 = require('gl-matrix').mat4;
@@ -50,6 +51,8 @@ class Ship extends Entity {
     this.children.push(this.frontRightSteerer);
     this.children.push(this.backLeftSteerer);
     this.children.push(this.backRightSteerer);
+
+    this.laserTimer = 0;
   }
 
   update(game, deltaTime, transformationMatrix = mat4.create()) {
@@ -78,6 +81,26 @@ class Ship extends Entity {
     if (game.keyboardInput.keysDown[68] || game.keyboardInput.keysDown[39]) {
       this.angle += deltaTime * 0.002;
       steeringRight = true;
+    }
+
+    if (game.keyboardInput.keysDown[32] || game.keyboardInput.keysDown[70]) {
+      this.laserTimer -= deltaTime;
+
+      if (this.laserTimer <= 0) {
+        let position = vec2.fromValues(0.0, -36.0);
+        let velocity = vec2.fromValues(0.0, -0.5);
+        let rotationMatrix = mat2.create();
+
+        mat2.rotate(rotationMatrix, rotationMatrix, this.angle);
+        vec2.transformMat2(position, position, rotationMatrix);
+        vec2.transformMat2(velocity, velocity, rotationMatrix);
+
+        game.gameState.entities.push(new Projectile(game, velocity, this.x + position[0], this.y + position[1], this.angle));
+
+        this.laserTimer = 200;
+      }
+    } else {
+      this.laserTimer = 0;
     }
 
     let accelerationMatrix = mat2.create();

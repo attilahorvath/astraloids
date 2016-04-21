@@ -14,8 +14,6 @@ class ParticleEmitter extends Entity {
   constructor(game, x = 0.0, y = 0.0, angle = 0.0) {
     super(game, x, y, angle);
 
-    this.vertexBuffer = game.renderer.createVertexBuffer(this.vertices);
-
     this.particleShader = game.renderer.shaders.particleShader;
 
     this.currentTime = 0;
@@ -25,6 +23,8 @@ class ParticleEmitter extends Entity {
     this.vertices = new Float32Array(maxVertices * (this.particleShader.vertexSize / Float32Array.BYTES_PER_ELEMENT));
     this.vertexCount = 0;
     this.vertexIndex = 0;
+
+    this.vertexBuffer = game.renderer.createVertexBuffer(this.vertices);
   }
 
   emitParticle(renderer, velocity, transformationMatrix = mat4.create(), red = Math.random(), green = Math.random(), blue = Math.random()) {

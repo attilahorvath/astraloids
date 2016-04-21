@@ -57,6 +57,8 @@ class Renderer {
     this.enabledVertexAttributeArrays = {};
     this.uniformValues = new Map();
 
+    this.lineWidth = 1.0;
+
     this.camera = new Camera(this.canvas.width / 2, this.canvas.height / 2);
 
     this.postProcessor = new PostProcessor(this);
@@ -87,6 +89,12 @@ class Renderer {
 
       this.viewportWidth = width;
       this.viewportHeight = height;
+    }
+  }
+
+  setLineWidth(lineWidth) {
+    if (lineWidth !== this.lineWidth) {
+      this.gl.lineWidth(lineWidth);
     }
   }
 
