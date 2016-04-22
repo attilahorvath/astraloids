@@ -41,6 +41,7 @@ class Ship extends Entity {
   }
 
   update(game, deltaTime, transformation = mat4.create()) {
+    this.angularVelocity = 0.0;
     let accelerationSize = 0.0;
 
     let accelerating = false;
@@ -59,12 +60,12 @@ class Ship extends Entity {
     }
 
     if (game.keyboardInput.keysDown[65] || game.keyboardInput.keysDown[37]) {
-      this.angle -= deltaTime * 0.002;
+      this.angularVelocity = -0.002;
       steeringLeft = true;
     }
 
     if (game.keyboardInput.keysDown[68] || game.keyboardInput.keysDown[39]) {
-      this.angle += deltaTime * 0.002;
+      this.angularVelocity = 0.002;
       steeringRight = true;
     }
 
