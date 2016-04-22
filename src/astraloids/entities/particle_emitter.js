@@ -27,8 +27,8 @@ class ParticleEmitter extends Entity {
     this.vertexBuffer = game.renderer.createVertexBuffer(this.vertices);
   }
 
-  emitParticle(renderer, velocity, transformation = mat4.create(), red = Math.random(), green = Math.random(), blue = Math.random()) {
-    this.emitParticles(renderer, [new Particle(velocity, red, green, blue)], transformation);
+  emitParticle(renderer, velocity, transformation = mat4.create(), color = vec3.fromValues(Math.random(), Math.random(), Math.random())) {
+    this.emitParticles(renderer, [new Particle(velocity, color)], transformation);
   }
 
   emitParticles(renderer, particles, transformation = mat4.create()) {
@@ -55,9 +55,9 @@ class ParticleEmitter extends Entity {
       this.vertices[arrayIndex++] = particle.velocity[0];
       this.vertices[arrayIndex++] = particle.velocity[1];
       this.vertices[arrayIndex++] = 0.0;
-      this.vertices[arrayIndex++] = particle.red;
-      this.vertices[arrayIndex++] = particle.green;
-      this.vertices[arrayIndex++] = particle.blue;
+      this.vertices[arrayIndex++] = particle.color[0];
+      this.vertices[arrayIndex++] = particle.color[1];
+      this.vertices[arrayIndex++] = particle.color[2];
       this.vertices[arrayIndex++] = 1.0;
       this.vertices[arrayIndex++] = this.currentTime;
     }

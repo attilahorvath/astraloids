@@ -8,6 +8,7 @@ import Projectile from './projectile';
 const mat2 = require('gl-matrix').mat2;
 const mat4 = require('gl-matrix').mat4;
 const vec2 = require('gl-matrix').vec2;
+const vec3 = require('gl-matrix').vec3;
 
 class Ship extends Entity {
   constructor(game, position = vec2.create(), velocity = vec2.create(), acceleration = vec2.create(), angle = 0.0, angularVelocity = 0.0, angularAcceleration = 0.0) {
@@ -24,7 +25,7 @@ class Ship extends Entity {
     this.simpleShader = game.renderer.shaders.simpleShader;
 
     this.thruster = new ParticleEmitter(game, 500.0, 5.0, vec2.fromValues(0.0, 30.0));
-    
+
     this.frontLeftSteerer = new ParticleEmitter(game, 100.0, 3.0, vec2.fromValues(-5.0, -20.0));
     this.frontRightSteerer = new ParticleEmitter(game, 100.0, 3.0, vec2.fromValues(5.0, -20.0));
     this.backLeftSteerer = new ParticleEmitter(game, 100.0, 3.0, vec2.fromValues(-20.0, 20.0));
@@ -103,7 +104,7 @@ class Ship extends Entity {
     }
 
     if (accelerating) {
-      this.thruster.emitParticle(game.renderer, vec2.create(), transformation, 0.5 + Math.random() * 0.5, 0, 0);
+      this.thruster.emitParticle(game.renderer, vec2.create(), transformation, vec3.fromValues(0.5 + Math.random() * 0.5, 0, 0));
     }
 
     if (decelerating) {
@@ -139,7 +140,7 @@ class Ship extends Entity {
       vec2.transformMat2(particleVelocity, particleVelocity, rotationMatrix);
       vec2.add(particleVelocity, particleVelocity, this.velocity);
 
-      particles.push(new Particle(particleVelocity, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5));
+      particles.push(new Particle(particleVelocity, vec3.fromValues(0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5)));
     }
 
     emitter.emitParticles(renderer, particles, transformation);
