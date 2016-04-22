@@ -11,14 +11,14 @@ const vec4 = require('gl-matrix').vec4;
 const maxVertices = 1000;
 
 class ParticleEmitter extends Entity {
-  constructor(game, x = 0.0, y = 0.0, angle = 0.0) {
-    super(game, x, y, angle);
+  constructor(game, lifetime = 100.0, pointSize = 1.5, position = vec2.create(), velocity = vec2.create(), acceleration = vec2.create(), angle = 0.0, angularVelocity = 0.0, angularAcceleration = 0.0) {
+    super(game, position, velocity, acceleration, angle, angularVelocity, angularAcceleration);
 
     this.particleShader = game.renderer.shaders.particleShader;
 
     this.currentTime = 0;
-    this.lifetime = this.particleShader.lifetimeValue;
-    this.pointSize = this.particleShader.pointSizeValue;
+    this.lifetime = lifetime;
+    this.pointSize = pointSize;
 
     this.vertices = new Float32Array(maxVertices * (this.particleShader.vertexSize / Float32Array.BYTES_PER_ELEMENT));
     this.vertexCount = 0;
@@ -27,13 +27,13 @@ class ParticleEmitter extends Entity {
     this.vertexBuffer = game.renderer.createVertexBuffer(this.vertices);
   }
 
-  emitParticle(renderer, velocity, transformationMatrix = mat4.create(), red = Math.random(), green = Math.random(), blue = Math.random()) {
-    this.emitParticles(renderer, [new Particle(velocity, red, green, blue)], transformationMatrix);
+  emitParticle(renderer, velocity, transformation = mat4.create(), red = Math.random(), green = Math.random(), blue = Math.random()) {
+    this.emitParticles(renderer, [new Particle(velocity, red, green, blue)], transformation);
   }
 
-  emitParticles(renderer, particles, transformationMatrix = mat4.create()) {
-    transformationMatrix = mat4.clone(transformationMatrix);
-    mat4.multiply(transformationMatrix, transformationMatrix, this.transformationMatrix);
+  emitParticles(renderer, particles, transformation = mat4.create()) {
+    transformation = mat4.clone(transformation);
+    mat4.multiply(transformation, transformation, this.transformation);
 
     this.vertexCount += particles.length;
 
@@ -43,7 +43,7 @@ class ParticleEmitter extends Entity {
 
     for (let particle of particles) {
       let position = vec2.create();
-      vec2.transformMat4(position, position, transformationMatrix);
+      vec2.transformMat4(position, position, transformation);
 
       this.vertexIndex = (++this.vertexIndex) % maxVertices;
 
@@ -65,11 +65,14 @@ class ParticleEmitter extends Entity {
     renderer.fillVertexBuffer(this.vertexBuffer, this.vertices);
   }
 
-  update(game, deltaTime, transformationMatrix = mat4.create()) {
+  update(game, deltaTime, transformation = mat4.create()) {
     this.currentTime += deltaTime;
+
+    this.integrateValues(deltaTime);
+    this.calculateTransformation();
   }
 
-  draw(renderer, deltaTime, transformationMatrix = mat4.create()) {
+  draw(renderer, deltaTime, transformation = mat4.create()) {
     if (this.vertexCount > 0) {
       this.particleShader.currentTimeValue = this.currentTime;
       this.particleShader.lifetimeValue = this.lifetime;

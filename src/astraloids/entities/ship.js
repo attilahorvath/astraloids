@@ -10,11 +10,8 @@ const mat4 = require('gl-matrix').mat4;
 const vec2 = require('gl-matrix').vec2;
 
 class Ship extends Entity {
-  constructor(game, x = 0.0, y = 0.0, angle = 0.0) {
-    super(game, x, y, angle);
-
-    this.acceleration = vec2.create();
-    this.velocity = vec2.create();
+  constructor(game, position = vec2.create(), velocity = vec2.create(), acceleration = vec2.create(), angle = 0.0, angularVelocity = 0.0, angularAcceleration = 0.0) {
+    super(game, position, velocity, acceleration, angle, angularVelocity, angularAcceleration);
 
     const vertices = [
         0.0, -30.0, 0.0, 1.0, 0.0, 0.0, 1.0,
@@ -26,25 +23,12 @@ class Ship extends Entity {
 
     this.simpleShader = game.renderer.shaders.simpleShader;
 
-    this.thruster = new ParticleEmitter(game, 0.0, 30.0, 0.0);
-    this.thruster.pointSize = 5.0;
-    this.thruster.lifetime = 500.0;
-
-    this.frontLeftSteerer = new ParticleEmitter(game, -5.0, -20.0, 0.0);
-    this.frontLeftSteerer.pointSize = 3.0;
-    this.frontLeftSteerer.lifetime = 100.0;
-
-    this.frontRightSteerer = new ParticleEmitter(game, 5.0, -20.0, 0.0);
-    this.frontRightSteerer.pointSize = 3.0;
-    this.frontRightSteerer.lifetime = 100.0;
-
-    this.backLeftSteerer = new ParticleEmitter(game, -20.0, 20.0, 0.0);
-    this.backLeftSteerer.pointSize = 3.0;
-    this.backLeftSteerer.lifetime = 100.0;
-
-    this.backRightSteerer = new ParticleEmitter(game, 20.0, 20.0, 0.0);
-    this.backRightSteerer.pointSize = 3.0;
-    this.backRightSteerer.lifetime = 100.0;
+    this.thruster = new ParticleEmitter(game, 500.0, 5.0, vec2.fromValues(0.0, 30.0));
+    
+    this.frontLeftSteerer = new ParticleEmitter(game, 100.0, 3.0, vec2.fromValues(-5.0, -20.0));
+    this.frontRightSteerer = new ParticleEmitter(game, 100.0, 3.0, vec2.fromValues(5.0, -20.0));
+    this.backLeftSteerer = new ParticleEmitter(game, 100.0, 3.0, vec2.fromValues(-20.0, 20.0));
+    this.backRightSteerer = new ParticleEmitter(game, 100.0, 3.0, vec2.fromValues(20.0, 20.0));
 
     this.children.push(this.thruster);
     this.children.push(this.frontLeftSteerer);
@@ -55,7 +39,7 @@ class Ship extends Entity {
     this.laserTimer = 0;
   }
 
-  update(game, deltaTime, transformationMatrix = mat4.create()) {
+  update(game, deltaTime, transformation = mat4.create()) {
     let accelerationSize = 0.0;
 
     let accelerating = false;
@@ -94,8 +78,9 @@ class Ship extends Entity {
         mat2.rotate(rotationMatrix, rotationMatrix, this.angle);
         vec2.transformMat2(position, position, rotationMatrix);
         vec2.transformMat2(velocity, velocity, rotationMatrix);
+        vec2.add(position, position, this.position);
 
-        game.gameState.entities.push(new Projectile(game, velocity, this.x + position[0], this.y + position[1], this.angle));
+        game.gameState.entities.push(new Projectile(game, position, velocity, vec2.create(), this.angle));
 
         this.laserTimer = 200;
       }
@@ -109,43 +94,39 @@ class Ship extends Entity {
     vec2.set(this.acceleration, 0.0, -accelerationSize);
     vec2.transformMat2(this.acceleration, this.acceleration, accelerationMatrix);
 
-    vec2.set(this.velocity, this.velocity[0] + this.acceleration[0] * deltaTime, this.velocity[1] + this.acceleration[1] * deltaTime);
+    this.integrateValues(deltaTime);
+    this.calculateTransformation();
 
     if (vec2.length(this.velocity) > 0.2) {
       vec2.normalize(this.velocity, this.velocity);
       vec2.scale(this.velocity, this.velocity, 0.2);
     }
 
-    this.x += this.velocity[0] * deltaTime;
-    this.y += this.velocity[1] * deltaTime;
-
-    this.calculateTransformationMatrix();
-
     if (accelerating) {
-      this.thruster.emitParticle(game.renderer, vec2.create(), transformationMatrix, 0.5 + Math.random() * 0.5, 0, 0);
+      this.thruster.emitParticle(game.renderer, vec2.create(), transformation, 0.5 + Math.random() * 0.5, 0, 0);
     }
 
     if (decelerating) {
-      this.emitSteeringParticles(this.frontLeftSteerer, game.renderer, 10, 0.0, -1.0, transformationMatrix);
-      this.emitSteeringParticles(this.frontRightSteerer, game.renderer, 10, 0.0, -1.0, transformationMatrix);
+      this.emitSteeringParticles(this.frontLeftSteerer, game.renderer, 10, 0.0, -1.0, transformation);
+      this.emitSteeringParticles(this.frontRightSteerer, game.renderer, 10, 0.0, -1.0, transformation);
     }
 
     if (steeringLeft) {
-      this.emitSteeringParticles(this.frontRightSteerer, game.renderer, 10, 1.0, 0.0, transformationMatrix);
-      this.emitSteeringParticles(this.backLeftSteerer, game.renderer, 10, -1.0, 0.0, transformationMatrix);
+      this.emitSteeringParticles(this.frontRightSteerer, game.renderer, 10, 1.0, 0.0, transformation);
+      this.emitSteeringParticles(this.backLeftSteerer, game.renderer, 10, -1.0, 0.0, transformation);
     }
 
     if (steeringRight) {
-      this.emitSteeringParticles(this.frontLeftSteerer, game.renderer, 10, -1.0, 0.0, transformationMatrix);
-      this.emitSteeringParticles(this.backRightSteerer, game.renderer, 10, 1.0, 0.0, transformationMatrix);
+      this.emitSteeringParticles(this.frontLeftSteerer, game.renderer, 10, -1.0, 0.0, transformation);
+      this.emitSteeringParticles(this.backRightSteerer, game.renderer, 10, 1.0, 0.0, transformation);
     }
   }
 
-  draw(renderer, deltaTime, transformationMatrix = mat4.create()) {
-    renderer.draw(this.simpleShader, transformationMatrix, this.vertexBuffer, renderer.gl.TRIANGLES, 3);
+  draw(renderer, deltaTime, transformation = mat4.create()) {
+    renderer.draw(this.simpleShader, transformation, this.vertexBuffer, renderer.gl.TRIANGLES, 3);
   }
 
-  emitSteeringParticles(emitter, renderer, count, velocityX, velocityY, transformationMatrix) {
+  emitSteeringParticles(emitter, renderer, count, velocityX, velocityY, transformation) {
     let particles = [];
 
     for (let i = 0; i < count; i++) {
@@ -161,7 +142,7 @@ class Ship extends Entity {
       particles.push(new Particle(particleVelocity, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5));
     }
 
-    emitter.emitParticles(renderer, particles, transformationMatrix);
+    emitter.emitParticles(renderer, particles, transformation);
   }
 }
 

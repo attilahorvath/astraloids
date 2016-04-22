@@ -126,7 +126,7 @@ class Renderer {
     }
   }
 
-  draw(shader, transformationMatrix, vertexBuffer, mode, count, skipCamera = false) {
+  draw(shader, transformation, vertexBuffer, mode, count, skipCamera = false) {
     if (vertexBuffer !== this.lastVertexBuffer) {
       this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertexBuffer);
 
@@ -136,7 +136,7 @@ class Renderer {
     shader.setVertexAttributes(this);
 
     let modelViewMatrix = mat4.clone(this.camera.modelViewMatrix);
-    mat4.multiply(modelViewMatrix, modelViewMatrix, transformationMatrix);
+    mat4.multiply(modelViewMatrix, modelViewMatrix, transformation);
 
     shader.modelViewMatrixValue = skipCamera ? mat4.create() : modelViewMatrix;
     shader.projectionMatrixValue = skipCamera ? mat4.create() : this.projectionMatrix;

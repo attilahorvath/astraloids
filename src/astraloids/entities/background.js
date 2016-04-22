@@ -4,111 +4,97 @@ import Entity from '../entity';
 import BackgroundLayer from './background_layer';
 
 const mat4 = require('gl-matrix').mat4;
+const vec2 = require('gl-matrix').vec2;
 
 class Background extends Entity {
-  constructor(game, ship, x = 0.0, y = 0.0, angle = 0.0) {
-    super(game, x, y, angle);
+  constructor(game, ship, position = vec2.create(), velocity = vec2.create(), acceleration = vec2.create(), angle = 0.0, angularVelocity = 0.0, angularAcceleration = 0.0) {
+    super(game, position, velocity, acceleration, angle, angularVelocity, angularAcceleration);
 
     this.ship = ship;
 
-    this.shipX = this.ship.x;
-    this.shipY = this.ship.y;
-
-    this.deltaShipX = 0;
-    this.deltaShipY = 0;
-
-    this.children.push(new BackgroundLayer(game, 500, 1.0, 1.0, x, y, angle));
-    this.children.push(new BackgroundLayer(game, 500, 1.5, 2.0, x, y, angle));
-    this.children.push(new BackgroundLayer(game, 500, 2.0, 3.0, x, y, angle));
+    this.children.push(new BackgroundLayer(game, 500, 1.0, 1.0, position, velocity, acceleration, angle, angularVelocity, angularAcceleration));
+    this.children.push(new BackgroundLayer(game, 500, 1.5, 2.0, position, velocity, acceleration, angle, angularVelocity, angularAcceleration));
+    this.children.push(new BackgroundLayer(game, 500, 2.0, 3.0, position, velocity, acceleration, angle, angularVelocity, angularAcceleration));
   }
 
-  update(game, deltaTime, transformationMatrix = mat4.create()) {
-    this.deltaShipX = this.ship.x - this.shipX;
-    this.deltaShipY = this.ship.y - this.shipY;
-
-    this.shipX = this.ship.x;
-    this.shipY = this.ship.y;
-
+  update(game, deltaTime, transformation = mat4.create()) {
     for (let layer of this.children) {
-      layer.x -= this.deltaShipX / layer.relativeVelocity;
-      layer.y -= this.deltaShipY / layer.relativeVelocity;
+      vec2.scaleAndAdd(layer.position, layer.position, this.ship.deltaPosition, 1.0 / layer.relativeVelocity);
 
-      if (layer.x - game.renderer.canvas.width / 2 > this.ship.x) {
-        layer.x -= game.renderer.canvas.width;
-      } else if (layer.x + game.renderer.canvas.width / 2 < this.ship.x) {
-        layer.x += game.renderer.canvas.width;
+      if (layer.position[0] - game.renderer.canvas.width / 2 > this.ship.position[0]) {
+        layer.position[0] -= game.renderer.canvas.width;
+      } else if (layer.position[0] + game.renderer.canvas.width / 2 < this.ship.position[0]) {
+        layer.position[0] += game.renderer.canvas.width;
       }
 
-      if (layer.y - game.renderer.canvas.height / 2 > this.ship.y) {
-        layer.y -= game.renderer.canvas.height;
-      } else if (layer.y + game.renderer.canvas.height / 2 < this.ship.y) {
-        layer.y += game.renderer.canvas.height;
+      if (layer.position[1] - game.renderer.canvas.height / 2 > this.ship.position[1]) {
+        layer.position[1] -= game.renderer.canvas.height;
+      } else if (layer.position[1] + game.renderer.canvas.height / 2 < this.ship.position[1]) {
+        layer.position[1] += game.renderer.canvas.height;
       }
 
-      layer.calculateTransformationMatrix();
+      layer.calculateTransformation();
     }
   }
 
-  drawAll(renderer, deltaTime, transformationMatrix = mat4.create()) {
-    transformationMatrix = mat4.clone(transformationMatrix);
-    mat4.multiply(transformationMatrix, transformationMatrix, this.transformationMatrix);
+  drawAll(renderer, deltaTime, transformation = mat4.create()) {
+    transformation = mat4.clone(transformation);
+    mat4.multiply(transformation, transformation, this.transformation);
 
     // TODO Refactor
 
     for (let layer of this.children) {
-      let layerX = layer.x;
-      let layerY = layer.y;
+      let layerPosition = vec2.clone(layer.position);
 
-      layer.drawAll(renderer, deltaTime, transformationMatrix);
+      layer.drawAll(renderer, deltaTime, transformation);
 
-      if (this.shipX <= layer.x) {
-        layer.x -= renderer.canvas.width;
+      if (this.ship.position[0] <= layer.position[0]) {
+        layer.position[0] -= renderer.canvas.width;
       } else {
-        layer.x += renderer.canvas.width;
+        layer.position[0] += renderer.canvas.width;
       }
 
-      layer.calculateTransformationMatrix();
+      layer.calculateTransformation();
 
-      layer.drawAll(renderer, deltaTime, transformationMatrix);
+      layer.drawAll(renderer, deltaTime, transformation);
 
-      layer.x = layerX;
+      layer.position[0] = layerPosition[0];
 
-      if (this.shipY <= layer.y) {
-        layer.y -= renderer.canvas.height;
+      if (this.ship.position[1] <= layer.position[1]) {
+        layer.position[1] -= renderer.canvas.height;
       } else {
-        layer.y += renderer.canvas.height;
+        layer.position[1] += renderer.canvas.height;
       }
 
-      layer.calculateTransformationMatrix();
+      layer.calculateTransformation();
 
-      layer.drawAll(renderer, deltaTime, transformationMatrix);
+      layer.drawAll(renderer, deltaTime, transformation);
 
-      layer.y = layerY;
+      layer.position[1] = layerPosition[1];
 
-      if (this.shipX <= layer.x) {
-        layer.x -= renderer.canvas.width;
-        if (this.shipY <= layer.y) {
-          layer.y -= renderer.canvas.height;
+      if (this.ship.position[0] <= layer.position[0]) {
+        layer.position[0] -= renderer.canvas.width;
+        if (this.ship.position[1] <= layer.position[1]) {
+          layer.position[1] -= renderer.canvas.height;
         } else {
-          layer.y += renderer.canvas.height;
+          layer.position[1] += renderer.canvas.height;
         }
       } else {
-        layer.x += renderer.canvas.width;
-        if (this.shipY <= layer.y) {
-          layer.y -= renderer.canvas.height;
+        layer.position[0] += renderer.canvas.width;
+        if (this.ship.position[1] <= layer.position[1]) {
+          layer.position[1] -= renderer.canvas.height;
         } else {
-          layer.y += renderer.canvas.height;
+          layer.position[1] += renderer.canvas.height;
         }
       }
 
-      layer.calculateTransformationMatrix();
+      layer.calculateTransformation();
 
-      layer.drawAll(renderer, deltaTime, transformationMatrix);
+      layer.drawAll(renderer, deltaTime, transformation);
 
-      layer.x = layerX;
-      layer.y = layerY;
+      layer.position = vec2.clone(layerPosition);
 
-      layer.calculateTransformationMatrix();
+      layer.calculateTransformation();
     }
   }
 }

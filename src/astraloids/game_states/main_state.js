@@ -6,6 +6,8 @@ import Background from '../entities/background';
 import Ship from '../entities/ship';
 import Asteroid from '../entities/asteroid';
 
+const vec2 = require('gl-matrix').vec2;
+
 class MainState extends GameState {
   constructor(game) {
     super(game);
@@ -15,7 +17,7 @@ class MainState extends GameState {
     this.entities.push(new Background(this.game, this.ship));
 
     for (let i = 0; i < 10; i++) {
-      this.entities.push(new Asteroid(this.game, -this.renderer.canvas.width / 2 + Math.random() * this.renderer.canvas.width, -this.renderer.canvas.height / 2 + Math.random() * this.renderer.canvas.height));
+      this.entities.push(new Asteroid(this.game, vec2.fromValues(-this.renderer.canvas.width / 2 + Math.random() * this.renderer.canvas.width, -this.renderer.canvas.height / 2 + Math.random() * this.renderer.canvas.height)));
     }
 
     this.entities.push(this.ship);
@@ -24,7 +26,7 @@ class MainState extends GameState {
   update(deltaTime) {
     super.update(deltaTime);
 
-    this.renderer.camera.setPosition(this.renderer.canvas.width / 2 - this.ship.x, this.renderer.canvas.height / 2 - this.ship.y);
+    this.renderer.camera.setPosition(this.renderer.canvas.width / 2 - this.ship.position[0], this.renderer.canvas.height / 2 - this.ship.position[1]);
   }
 
   draw(deltaTime) {

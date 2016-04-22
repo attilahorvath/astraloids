@@ -1,51 +1,86 @@
 'use strict';
 
 const mat4 = require('gl-matrix').mat4;
+const vec2 = require('gl-matrix').vec2;
+const vec3 = require('gl-matrix').vec3;
 const vec4 = require('gl-matrix').vec4;
 
 class Entity {
-  constructor(game = null, x = 0.0, y = 0.0, angle = 0.0) {
-    this.x = x;
-    this.y = y;
-    this.angle = angle;
+  constructor(game, position = vec2.create(), velocity = vec2.create(), acceleration = vec2.create(), angle = 0.0, angularVelocity = 0.0, angularAcceleration = 0.0) {
+    this.position = vec2.clone(position);
+    this.velocity = vec2.clone(velocity);
+    this.acceleration = vec2.clone(acceleration);
 
-    this.calculateTransformationMatrix();
+    this.deltaPosition = vec2.create();
+    this.deltaVelocity = vec2.create();
+
+    this.angle = angle;
+    this.angularVelocity = angularVelocity;
+    this.angularAcceleration = angularAcceleration;
+
+    this.deltaAngle = 0.0;
+    this.deltaAngularVelocity = 0.0;
+
+    this.calculateTransformation();
 
     this.children = [];
   }
 
-  updateAll(game, deltaTime, transformationMatrix = mat4.create()) {
-    transformationMatrix = mat4.clone(transformationMatrix);
-    mat4.multiply(transformationMatrix, transformationMatrix, this.transformationMatrix);
+  updateAll(game, deltaTime, transformation = mat4.create()) {
+    transformation = mat4.clone(transformation);
+    mat4.multiply(transformation, transformation, this.transformation);
 
     for (let child of this.children) {
-      child.updateAll(game, deltaTime, transformationMatrix);
+      child.updateAll(game, deltaTime, transformation);
     }
 
-    this.update(game, deltaTime, transformationMatrix);
+    this.update(game, deltaTime, transformation);
   }
 
-  update(game, deltaTime, transformationMatrix = mat4.create()) {}
+  update(game, deltaTime, transformation = mat4.create()) {
+    this.integrateValues(deltaTime);
+    this.calculateTransformation();
+  }
 
-  drawAll(renderer, deltaTime, transformationMatrix = mat4.create()) {
-    transformationMatrix = mat4.clone(transformationMatrix);
-    mat4.multiply(transformationMatrix, transformationMatrix, this.transformationMatrix);
+  drawAll(renderer, deltaTime, transformation = mat4.create()) {
+    transformation = mat4.clone(transformation);
+    mat4.multiply(transformation, transformation, this.transformation);
 
     for (let child of this.children) {
-      child.drawAll(renderer, deltaTime, transformationMatrix);
+      child.drawAll(renderer, deltaTime, transformation);
     }
 
-    this.draw(renderer, deltaTime, transformationMatrix);
+    this.draw(renderer, deltaTime, transformation);
   }
 
-  draw(renderer, deltaTime, transformationMatrix = mat4.create()) {}
+  draw(renderer, deltaTime, transformation = mat4.create()) {}
 
-  calculateTransformationMatrix() {
-    let translationVector = vec4.fromValues(this.x, this.y, 0.0, 1.0);
+  integrateValues(deltaTime) {
+    let oldPosition = vec2.clone(this.position);
+    let oldVelocity = vec2.clone(this.velocity);
 
-    this.transformationMatrix = mat4.create();
-    mat4.translate(this.transformationMatrix, this.transformationMatrix, translationVector);
-    mat4.rotateZ(this.transformationMatrix, this.transformationMatrix, this.angle);
+    vec2.scaleAndAdd(this.velocity, this.velocity, this.acceleration, deltaTime);
+    vec2.scaleAndAdd(this.position, this.position, this.velocity, deltaTime);
+
+    vec2.subtract(this.deltaPosition, this.position, oldPosition);
+    vec2.subtract(this.deltaVelocity, this.velocity, oldVelocity);
+
+    let oldAngle = this.angle;
+    let oldAngularVelocity = this.angularVelocity;
+
+    this.angularVelocity += this.angularAcceleration * deltaTime;
+    this.angle += this.angularVelocity * deltaTime;
+
+    this.deltaAngle = this.angle - oldAngle;
+    this.deltaAngularVelocity = this.angularVelocity - oldAngularVelocity;
+  }
+
+  calculateTransformation() {
+    let translation = vec3.fromValues(this.position[0], this.position[1], 0.0);
+
+    this.transformation = mat4.create();
+    mat4.translate(this.transformation, this.transformation, translation);
+    mat4.rotateZ(this.transformation, this.transformation, this.angle);
   }
 }
 

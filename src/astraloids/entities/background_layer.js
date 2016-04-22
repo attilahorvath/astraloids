@@ -3,10 +3,11 @@
 import Entity from '../entity';
 
 const mat4 = require('gl-matrix').mat4;
+const vec2 = require('gl-matrix').vec2;
 
 class BackgroundLayer extends Entity {
-  constructor(game, stars = 500, pointSize = 1.0, relativeVelocity = 1.0, x = 0.0, y = 0.0, angle = 0.0) {
-    super(game, x, y, angle);
+  constructor(game, stars = 500, pointSize = 1.0, relativeVelocity = 1.0, position = vec2.create(), velocity = vec2.create(), acceleration = vec2.create(), angle = 0.0, angularVelocity = 0.0, angularAcceleration = 0.0) {
+    super(game, position, velocity, acceleration, angle, angularVelocity, angularAcceleration);
 
     this.stars = stars;
     this.pointSize = pointSize;
@@ -23,10 +24,10 @@ class BackgroundLayer extends Entity {
     this.pointShader = game.renderer.shaders.pointShader;
   }
 
-  draw(renderer, deltaTime, transformationMatrix = mat4.create()) {
+  draw(renderer, deltaTime, transformation = mat4.create()) {
     this.pointShader.pointSizeValue = this.pointSize;
 
-    renderer.draw(this.pointShader, transformationMatrix, this.vertexBuffer, renderer.gl.POINTS, this.stars);
+    renderer.draw(this.pointShader, transformation, this.vertexBuffer, renderer.gl.POINTS, this.stars);
   }
 }
 
