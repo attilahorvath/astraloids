@@ -12,6 +12,7 @@ import Camera from './camera';
 import PostProcessor from './post_processor';
 
 const mat4 = require('gl-matrix').mat4;
+const vec2 = require('gl-matrix').vec2;
 const vec4 = require('gl-matrix').vec4;
 
 const width = 1024;
@@ -59,7 +60,7 @@ class Renderer {
 
     this.lineWidth = 1.0;
 
-    this.camera = new Camera(this.canvas.width / 2, this.canvas.height / 2);
+    this.camera = new Camera(vec2.fromValues(this.canvas.width / 2, this.canvas.height / 2));
 
     this.postProcessor = new PostProcessor(this);
   }

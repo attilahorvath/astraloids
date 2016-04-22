@@ -26,7 +26,8 @@ class MainState extends GameState {
   update(deltaTime) {
     super.update(deltaTime);
 
-    this.renderer.camera.setPosition(this.renderer.canvas.width / 2 - this.ship.position[0], this.renderer.canvas.height / 2 - this.ship.position[1]);
+    this.renderer.camera.position = vec2.fromValues(this.renderer.canvas.width / 2 - this.ship.position[0], this.renderer.canvas.height / 2 - this.ship.position[1]);
+    this.renderer.camera.calculateModelViewMatrix();
   }
 
   draw(deltaTime) {
