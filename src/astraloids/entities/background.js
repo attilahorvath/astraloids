@@ -3,7 +3,6 @@
 import Entity from '../entity';
 import BackgroundLayer from './background_layer';
 
-const mat4 = require('gl-matrix').mat4;
 const vec2 = require('gl-matrix').vec2;
 
 class Background extends Entity {
@@ -12,90 +11,9 @@ class Background extends Entity {
 
     this.ship = ship;
 
-    this.children.push(new BackgroundLayer(game, 500, 1.0, 1.0, position, velocity, acceleration, angle, angularVelocity, angularAcceleration));
-    this.children.push(new BackgroundLayer(game, 500, 1.5, 2.0, position, velocity, acceleration, angle, angularVelocity, angularAcceleration));
-    this.children.push(new BackgroundLayer(game, 500, 2.0, 3.0, position, velocity, acceleration, angle, angularVelocity, angularAcceleration));
-  }
-
-  update(game, deltaTime, transformation = mat4.create()) {
-    for (let layer of this.children) {
-      vec2.scaleAndAdd(layer.position, layer.position, this.ship.deltaPosition, 1.0 / layer.relativeVelocity);
-
-      if (layer.position[0] - game.renderer.dimensions[0] / 2 > this.ship.position[0]) {
-        layer.position[0] -= game.renderer.dimensions[0];
-      } else if (layer.position[0] + game.renderer.dimensions[0] / 2 < this.ship.position[0]) {
-        layer.position[0] += game.renderer.dimensions[0];
-      }
-
-      if (layer.position[1] - game.renderer.dimensions[1] / 2 > this.ship.position[1]) {
-        layer.position[1] -= game.renderer.dimensions[1];
-      } else if (layer.position[1] + game.renderer.dimensions[1] / 2 < this.ship.position[1]) {
-        layer.position[1] += game.renderer.dimensions[1];
-      }
-
-      layer.calculateTransformation();
-    }
-  }
-
-  drawAll(renderer, deltaTime, transformation = mat4.create()) {
-    transformation = mat4.clone(transformation);
-    mat4.multiply(transformation, transformation, this.transformation);
-
-    // TODO Refactor
-
-    for (let layer of this.children) {
-      let layerPosition = vec2.clone(layer.position);
-
-      layer.drawAll(renderer, deltaTime, transformation);
-
-      if (this.ship.position[0] <= layer.position[0]) {
-        layer.position[0] -= renderer.dimensions[0];
-      } else {
-        layer.position[0] += renderer.dimensions[0];
-      }
-
-      layer.calculateTransformation();
-
-      layer.drawAll(renderer, deltaTime, transformation);
-
-      layer.position[0] = layerPosition[0];
-
-      if (this.ship.position[1] <= layer.position[1]) {
-        layer.position[1] -= renderer.dimensions[1];
-      } else {
-        layer.position[1] += renderer.dimensions[1];
-      }
-
-      layer.calculateTransformation();
-
-      layer.drawAll(renderer, deltaTime, transformation);
-
-      layer.position[1] = layerPosition[1];
-
-      if (this.ship.position[0] <= layer.position[0]) {
-        layer.position[0] -= renderer.dimensions[0];
-        if (this.ship.position[1] <= layer.position[1]) {
-          layer.position[1] -= renderer.dimensions[1];
-        } else {
-          layer.position[1] += renderer.dimensions[1];
-        }
-      } else {
-        layer.position[0] += renderer.dimensions[0];
-        if (this.ship.position[1] <= layer.position[1]) {
-          layer.position[1] -= renderer.dimensions[1];
-        } else {
-          layer.position[1] += renderer.dimensions[1];
-        }
-      }
-
-      layer.calculateTransformation();
-
-      layer.drawAll(renderer, deltaTime, transformation);
-
-      layer.position = vec2.clone(layerPosition);
-
-      layer.calculateTransformation();
-    }
+    this.children.push(new BackgroundLayer(game, this, 500, 1.0, 1.0, position, velocity, acceleration, angle, angularVelocity, angularAcceleration));
+    this.children.push(new BackgroundLayer(game, this, 500, 1.5, 2.0, position, velocity, acceleration, angle, angularVelocity, angularAcceleration));
+    this.children.push(new BackgroundLayer(game, this, 500, 2.0, 3.0, position, velocity, acceleration, angle, angularVelocity, angularAcceleration));
   }
 }
 

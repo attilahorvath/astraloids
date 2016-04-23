@@ -6,8 +6,10 @@ const mat4 = require('gl-matrix').mat4;
 const vec2 = require('gl-matrix').vec2;
 
 class BackgroundLayer extends Entity {
-  constructor(game, stars = 500, pointSize = 1.0, relativeVelocity = 1.0, position = vec2.create(), velocity = vec2.create(), acceleration = vec2.create(), angle = 0.0, angularVelocity = 0.0, angularAcceleration = 0.0) {
+  constructor(game, background, stars = 500, pointSize = 1.0, relativeVelocity = 1.0, position = vec2.create(), velocity = vec2.create(), acceleration = vec2.create(), angle = 0.0, angularVelocity = 0.0, angularAcceleration = 0.0) {
     super(game, position, velocity, acceleration, angle, angularVelocity, angularAcceleration);
+
+    this.background = background;
 
     this.stars = stars;
     this.pointSize = pointSize;
@@ -24,10 +26,50 @@ class BackgroundLayer extends Entity {
     this.pointShader = game.renderer.shaders.pointShader;
   }
 
+  update(game, deltaTime, transformation = mat4.create()) {
+    vec2.scaleAndAdd(this.position, this.position, this.background.ship.deltaPosition, 1.0 / this.relativeVelocity);
+
+    for (let i = 0; i <= 1; i++) {
+      if (this.position[i] - game.renderer.dimensions[i] / 2 > this.background.ship.position[i]) {
+        this.position[i] -= game.renderer.dimensions[i];
+      } else if (this.position[i] + game.renderer.dimensions[i] / 2 < this.background.ship.position[i]) {
+        this.position[i] += game.renderer.dimensions[i];
+      }
+    }
+
+    this.calculateTransformation();
+  }
+
   draw(renderer, deltaTime, transformation = mat4.create()) {
     this.pointShader.pointSizeValue = this.pointSize;
 
-    renderer.draw(this.pointShader, transformation, this.vertexBuffer, renderer.gl.POINTS, this.stars);
+    let position = vec2.clone(this.position);
+
+    for (let i = 0; i < 4; i++) {
+      if (i === 1 || i === 3) {
+        if (this.background.ship.position[0] <= this.position[0]) {
+          this.position[0] -= renderer.dimensions[0];
+        } else {
+          this.position[0] += renderer.dimensions[0];
+        }
+      }
+
+      if (i === 2 || i === 3) {
+        if (this.background.ship.position[1] <= this.position[1]) {
+          this.position[1] -= renderer.dimensions[1];
+        } else {
+          this.position[1] += renderer.dimensions[1];
+        }
+      }
+
+      this.calculateTransformation();
+
+      renderer.draw(this.pointShader, this.transformation, this.vertexBuffer, renderer.gl.POINTS, this.stars);
+
+      this.position = vec2.clone(position);
+    }
+
+    this.calculateTransformation();
   }
 }
 
