@@ -46,7 +46,7 @@ class BackgroundLayer extends Entity {
     let position = vec2.clone(this.position);
 
     for (let i = 0; i < 4; i++) {
-      if (i === 1 || i === 3) {
+      if (i % 2 === 1) {
         if (this.background.ship.position[0] <= this.position[0]) {
           this.position[0] -= renderer.dimensions[0];
         } else {
@@ -54,7 +54,7 @@ class BackgroundLayer extends Entity {
         }
       }
 
-      if (i === 2 || i === 3) {
+      if (i >= 2) {
         if (this.background.ship.position[1] <= this.position[1]) {
           this.position[1] -= renderer.dimensions[1];
         } else {
