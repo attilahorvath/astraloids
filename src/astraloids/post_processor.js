@@ -1,23 +1,27 @@
 'use strict';
 
 const mat4 = require('gl-matrix').mat4;
+const vec2 = require('gl-matrix').vec2;
+const vec4 = require('gl-matrix').vec4;
 
-const downscaleFactor = 4;
+const downscaleFactor = 4.0;
 
 class PostProcessor {
   constructor(renderer) {
     this.renderer = renderer;
 
+    this.downscaledDimensions = vec2.scale(vec2.create(), renderer.dimensions, 1.0 / downscaleFactor);
+
     this.textures = [
-      this.prepareTexture(this.renderer.canvas.width, this.renderer.canvas.height),
-      this.prepareTexture(this.renderer.canvas.width, this.renderer.canvas.height)
+      this.prepareTexture(this.renderer.dimensions),
+      this.prepareTexture(this.renderer.dimensions)
     ];
 
     this.framebuffers = this.textures.map(texture => this.prepareFramebuffer(texture));
 
     this.downscaledTextures = [
-      this.prepareTexture(this.renderer.canvas.width / downscaleFactor, this.renderer.canvas.height / downscaleFactor),
-      this.prepareTexture(this.renderer.canvas.width / downscaleFactor, this.renderer.canvas.height / downscaleFactor)
+      this.prepareTexture(this.downscaledDimensions),
+      this.prepareTexture(this.downscaledDimensions)
     ];
 
     this.downscaledFramebuffers = this.downscaledTextures.map(texture => this.prepareFramebuffer(texture));
@@ -40,7 +44,7 @@ class PostProcessor {
     this.renderer.gl.bindFramebuffer(this.renderer.gl.FRAMEBUFFER, null);
   }
 
-  prepareTexture(width, height) {
+  prepareTexture(dimensions) {
     let texture = this.renderer.gl.createTexture();
 
     this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, texture);
@@ -49,7 +53,7 @@ class PostProcessor {
     this.renderer.gl.texParameteri(this.renderer.gl.TEXTURE_2D, this.renderer.gl.TEXTURE_WRAP_S, this.renderer.gl.CLAMP_TO_EDGE);
     this.renderer.gl.texParameteri(this.renderer.gl.TEXTURE_2D, this.renderer.gl.TEXTURE_WRAP_T, this.renderer.gl.CLAMP_TO_EDGE);
 
-    this.renderer.gl.texImage2D(this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA, width, height, 0, this.renderer.gl.RGBA, this.renderer.gl.UNSIGNED_BYTE, null);
+    this.renderer.gl.texImage2D(this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA, dimensions[0], dimensions[1], 0, this.renderer.gl.RGBA, this.renderer.gl.UNSIGNED_BYTE, null);
 
     return texture;
   }
@@ -68,7 +72,7 @@ class PostProcessor {
     this.downscaled = downscaled;
 
     if (this.downscaled) {
-      this.renderer.setSize(this.renderer.canvas.width / downscaleFactor, this.renderer.canvas.height / downscaleFactor);
+      this.renderer.setViewport(vec4.fromValues(0, 0, this.downscaledDimensions[0], this.downscaledDimensions[1]));
     }
 
     this.renderer.gl.bindFramebuffer(this.renderer.gl.FRAMEBUFFER, (this.downscaled ? this.downscaledFramebuffers : this.framebuffers)[0]);
@@ -82,7 +86,7 @@ class PostProcessor {
     this.renderer.gl.bindFramebuffer(this.renderer.gl.FRAMEBUFFER, null);
 
     if (this.downscaled) {
-      this.renderer.setSize(this.renderer.canvas.width, this.renderer.canvas.height);
+      this.renderer.setViewport(vec4.fromValues(0, 0, this.renderer.dimensions[0], this.renderer.dimensions[1]));
     }
   }
 
@@ -92,7 +96,7 @@ class PostProcessor {
     this.renderer.gl.bindFramebuffer(this.renderer.gl.FRAMEBUFFER, (this.downscaled ? this.downscaledFramebuffers : this.framebuffers)[currentFramebuffer]);
 
     if (this.downscaled) {
-      this.renderer.setSize(this.renderer.canvas.width / downscaleFactor, this.renderer.canvas.height / downscaleFactor);
+      this.renderer.setViewport(vec4.fromValues(0, 0, this.downscaledDimensions[0], this.downscaledDimensions[1]));
     }
 
     this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, (this.downscaled ? this.downscaledTextures : this.textures)[this.lastFramebuffer]);
@@ -102,7 +106,7 @@ class PostProcessor {
     this.lastFramebuffer = currentFramebuffer;
 
     if (this.downscaled) {
-      this.renderer.setSize(this.renderer.canvas.width, this.renderer.canvas.height);
+      this.renderer.setViewport(vec4.fromValues(0, 0, this.renderer.dimensions[0], this.renderer.dimensions[1]));
     }
 
     this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
@@ -112,7 +116,7 @@ class PostProcessor {
   draw(shader, additiveBlend = false) {
     this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, (this.downscaled ? this.downscaledTextures : this.textures)[this.lastFramebuffer]);
 
-    this.renderer.setSize(this.renderer.canvas.width, this.renderer.canvas.height);
+    this.renderer.setViewport(vec4.fromValues(0, 0, this.renderer.dimensions[0], this.renderer.dimensions[1]));
 
     if (additiveBlend) {
       this.renderer.gl.blendFunc(this.renderer.gl.SRC_ALPHA, this.renderer.gl.ONE);
@@ -125,14 +129,6 @@ class PostProcessor {
     }
 
     this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
-  }
-
-  downscaledWidth() {
-    return this.renderer.canvas.width / downscaleFactor;
-  }
-
-  downscaledHeight() {
-    return this.renderer.canvas.height / downscaleFactor;
   }
 }
 

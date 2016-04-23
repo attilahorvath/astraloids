@@ -15,21 +15,22 @@ const mat4 = require('gl-matrix').mat4;
 const vec2 = require('gl-matrix').vec2;
 const vec4 = require('gl-matrix').vec4;
 
-const width = 1024;
-const height = 768;
-
 class Renderer {
-  constructor() {
+  constructor(dimensions = vec2.fromValues(1024, 768)) {
+    this.dimensions = vec2.clone(dimensions);
+
     this.canvas = document.createElement('canvas');
 
-    this.canvas.width = width;
-    this.canvas.height = height;
+    this.canvas.width = this.dimensions[0];
+    this.canvas.height = this.dimensions[1];
+
+    this.viewport = vec4.fromValues(0, 0, this.dimensions[0], this.dimensions[1]);
 
     document.body.appendChild(this.canvas);
 
     this.gl = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
 
-    this.gl.viewport(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
+    this.gl.viewport(this.viewport[0], this.viewport[1], this.viewport[2], this.viewport[3]);
     this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
     this.gl.enable(this.gl.BLEND);
@@ -37,7 +38,7 @@ class Renderer {
     this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 
     this.projectionMatrix = mat4.create();
-    mat4.ortho(this.projectionMatrix, 0, this.canvas.clientWidth, this.canvas.clientHeight, 0, -1, 1);
+    mat4.ortho(this.projectionMatrix, 0, this.dimensions[0], this.dimensions[1], 0, -1, 1);
 
     this.shaders = {
       simpleShader: new SimpleShader(this),
@@ -49,9 +50,6 @@ class Renderer {
       thresholdShader: new ThresholdShader(this)
     };
 
-    this.viewportWidth = width;
-    this.viewportHeight = height;
-
     this.lastVertexBuffer = null;
     this.lastShaderProgram = null;
 
@@ -60,7 +58,7 @@ class Renderer {
 
     this.lineWidth = 1.0;
 
-    this.camera = new Camera(vec2.fromValues(this.canvas.width / 2, this.canvas.height / 2));
+    this.camera = new Camera(vec2.scale(vec2.create(), this.dimensions, 0.5));
 
     this.postProcessor = new PostProcessor(this);
   }
@@ -84,12 +82,11 @@ class Renderer {
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertices), this.gl.STATIC_DRAW);
   }
 
-  setSize(width, height) {
-    if (width !== this.viewportWidth || height !== this.viewportHeight) {
-      this.gl.viewport(0, 0, width, height);
+  setViewport(viewport) {
+    if (viewport[0] !== this.viewport[0] || viewport[1] !== this.viewport[1] || viewport[2] !== this.viewport[2] || viewport[3] !== this.viewport[3]) {
+      this.gl.viewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
-      this.viewportWidth = width;
-      this.viewportHeight = height;
+      this.viewport = vec4.clone(viewport);
     }
   }
 

@@ -3,6 +3,8 @@
 import VertexAttribute from '../vertex_attribute';
 import Shader from '../shader';
 
+const vec2 = require('gl-matrix').vec2;
+
 const vertexShaderSource = require('../../../shaders/blur.vert');
 const fragmentShaderSource = require('../../../shaders/blur.frag');
 
@@ -22,7 +24,7 @@ class BlurShader extends Shader {
     super(renderer, vertexShaderSource, fragmentShaderSource, vertexAttributes, uniforms);
 
     this.samplerValue = 0;
-    this.textureSizeValue = [renderer.canvas.width, renderer.canvas.height];
+    this.textureSizeValue = vec2.clone(renderer.dimensions);
     this.directionValue = [1.0, 0.0];
     this.radiusValue = 1.0;
   }

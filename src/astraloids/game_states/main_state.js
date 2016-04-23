@@ -17,7 +17,7 @@ class MainState extends GameState {
     this.entities.push(new Background(this.game, this.ship));
 
     for (let i = 0; i < 10; i++) {
-      this.entities.push(new Asteroid(this.game, vec2.fromValues(-this.renderer.canvas.width / 2 + Math.random() * this.renderer.canvas.width, -this.renderer.canvas.height / 2 + Math.random() * this.renderer.canvas.height)));
+      this.entities.push(new Asteroid(this.game, vec2.fromValues(-this.renderer.dimensions[0] / 2 + Math.random() * this.renderer.dimensions[0], -this.renderer.dimensions[1] / 2 + Math.random() * this.renderer.dimensions[1])));
     }
 
     this.entities.push(this.ship);
@@ -26,7 +26,10 @@ class MainState extends GameState {
   update(deltaTime) {
     super.update(deltaTime);
 
-    this.renderer.camera.position = vec2.fromValues(this.renderer.canvas.width / 2 - this.ship.position[0], this.renderer.canvas.height / 2 - this.ship.position[1]);
+    let cameraPosition = vec2.negate(vec2.create(), this.ship.position);
+    vec2.scaleAndAdd(cameraPosition, cameraPosition, this.renderer.dimensions, 0.5);
+
+    this.renderer.camera.position = cameraPosition;
     this.renderer.camera.calculateModelViewMatrix();
   }
 
@@ -43,7 +46,7 @@ class MainState extends GameState {
 
     this.renderer.postProcessor.process(this.renderer.shaders.thresholdShader);
 
-    this.renderer.shaders.blurShader.textureSizeValue = [this.renderer.postProcessor.downscaledWidth(), this.renderer.postProcessor.downscaledHeight()];
+    this.renderer.shaders.blurShader.textureSizeValue = vec2.clone(this.renderer.postProcessor.downscaledDimensions);
 
     this.renderer.shaders.blurShader.directionValue = [1.0, 0.0];
     this.renderer.postProcessor.process(this.renderer.shaders.blurShader);

@@ -21,16 +21,16 @@ class Background extends Entity {
     for (let layer of this.children) {
       vec2.scaleAndAdd(layer.position, layer.position, this.ship.deltaPosition, 1.0 / layer.relativeVelocity);
 
-      if (layer.position[0] - game.renderer.canvas.width / 2 > this.ship.position[0]) {
-        layer.position[0] -= game.renderer.canvas.width;
-      } else if (layer.position[0] + game.renderer.canvas.width / 2 < this.ship.position[0]) {
-        layer.position[0] += game.renderer.canvas.width;
+      if (layer.position[0] - game.renderer.dimensions[0] / 2 > this.ship.position[0]) {
+        layer.position[0] -= game.renderer.dimensions[0];
+      } else if (layer.position[0] + game.renderer.dimensions[0] / 2 < this.ship.position[0]) {
+        layer.position[0] += game.renderer.dimensions[0];
       }
 
-      if (layer.position[1] - game.renderer.canvas.height / 2 > this.ship.position[1]) {
-        layer.position[1] -= game.renderer.canvas.height;
-      } else if (layer.position[1] + game.renderer.canvas.height / 2 < this.ship.position[1]) {
-        layer.position[1] += game.renderer.canvas.height;
+      if (layer.position[1] - game.renderer.dimensions[1] / 2 > this.ship.position[1]) {
+        layer.position[1] -= game.renderer.dimensions[1];
+      } else if (layer.position[1] + game.renderer.dimensions[1] / 2 < this.ship.position[1]) {
+        layer.position[1] += game.renderer.dimensions[1];
       }
 
       layer.calculateTransformation();
@@ -49,9 +49,9 @@ class Background extends Entity {
       layer.drawAll(renderer, deltaTime, transformation);
 
       if (this.ship.position[0] <= layer.position[0]) {
-        layer.position[0] -= renderer.canvas.width;
+        layer.position[0] -= renderer.dimensions[0];
       } else {
-        layer.position[0] += renderer.canvas.width;
+        layer.position[0] += renderer.dimensions[0];
       }
 
       layer.calculateTransformation();
@@ -61,9 +61,9 @@ class Background extends Entity {
       layer.position[0] = layerPosition[0];
 
       if (this.ship.position[1] <= layer.position[1]) {
-        layer.position[1] -= renderer.canvas.height;
+        layer.position[1] -= renderer.dimensions[1];
       } else {
-        layer.position[1] += renderer.canvas.height;
+        layer.position[1] += renderer.dimensions[1];
       }
 
       layer.calculateTransformation();
@@ -73,18 +73,18 @@ class Background extends Entity {
       layer.position[1] = layerPosition[1];
 
       if (this.ship.position[0] <= layer.position[0]) {
-        layer.position[0] -= renderer.canvas.width;
+        layer.position[0] -= renderer.dimensions[0];
         if (this.ship.position[1] <= layer.position[1]) {
-          layer.position[1] -= renderer.canvas.height;
+          layer.position[1] -= renderer.dimensions[1];
         } else {
-          layer.position[1] += renderer.canvas.height;
+          layer.position[1] += renderer.dimensions[1];
         }
       } else {
-        layer.position[0] += renderer.canvas.width;
+        layer.position[0] += renderer.dimensions[0];
         if (this.ship.position[1] <= layer.position[1]) {
-          layer.position[1] -= renderer.canvas.height;
+          layer.position[1] -= renderer.dimensions[1];
         } else {
-          layer.position[1] += renderer.canvas.height;
+          layer.position[1] += renderer.dimensions[1];
         }
       }
 
