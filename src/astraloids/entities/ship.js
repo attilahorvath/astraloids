@@ -5,6 +5,8 @@ import Particle from '../particle';
 import ParticleEmitter from './particle_emitter';
 import Projectile from './projectile';
 
+import { pointInTriangle } from '../math';
+
 const mat2 = require('gl-matrix').mat2;
 const mat4 = require('gl-matrix').mat4;
 const vec2 = require('gl-matrix').vec2;
@@ -14,13 +16,19 @@ class Ship extends Entity {
   constructor(game, position = vec2.create(), velocity = vec2.create(), acceleration = vec2.create(), angle = 0.0, angularVelocity = 0.0, angularAcceleration = 0.0) {
     super(game, position, velocity, acceleration, angle, angularVelocity, angularAcceleration);
 
-    const vertices = [
-        0.0, -30.0, 0.0, 1.0, 0.0, 0.0, 1.0,
-      -25.0,  30.0, 0.0, 1.0, 0.0, 0.0, 1.0,
-       25.0,  30.0, 0.0, 1.0, 0.0, 0.0, 1.0
+    this.points = [
+      vec2.fromValues(  0.0, -30.0),
+      vec2.fromValues(-25.0,  30.0),
+      vec2.fromValues( 25.0,  30.0)
     ];
 
-    this.vertexBuffer = game.renderer.createVertexBuffer(vertices);
+    this.vertices = [];
+
+    for (let point of this.points) {
+      this.vertices.push(point[0], point[1], 0.0, 1.0, 0.0, 0.0, 1.0);
+    }
+
+    this.vertexBuffer = game.renderer.createVertexBuffer(this.vertices);
 
     this.simpleShader = game.renderer.shaders.simpleShader;
 
@@ -126,6 +134,14 @@ class Ship extends Entity {
 
   draw(renderer, deltaTime, transformation = mat4.create()) {
     renderer.draw(this.simpleShader, transformation, this.vertexBuffer, null, renderer.gl.TRIANGLES, 3);
+  }
+
+  containsPoint(point, transformation = mat4.create()) {
+    let a = vec2.transformMat4(vec2.create(), this.points[0], transformation);
+    let b = vec2.transformMat4(vec2.create(), this.points[1], transformation);
+    let c = vec2.transformMat4(vec2.create(), this.points[2], transformation);
+
+    return pointInTriangle(point, a, b, c);
   }
 
   emitSteeringParticles(emitter, renderer, count, velocityX, velocityY, transformation) {

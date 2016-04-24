@@ -17,8 +17,13 @@ class MainState extends GameState {
 
     this.entities.push(new Background(this.game, this.ship));
 
+    this.asteroids = [];
+
     for (let i = 0; i < 10; i++) {
-      this.entities.push(new Asteroid(this.game, vec2.fromValues(-this.renderer.dimensions[0] / 2 + Math.random() * this.renderer.dimensions[0], -this.renderer.dimensions[1] / 2 + Math.random() * this.renderer.dimensions[1])));
+      let asteroid = new Asteroid(this.game, vec2.fromValues(-this.renderer.dimensions[0] / 2 + Math.random() * this.renderer.dimensions[0], -this.renderer.dimensions[1] / 2 + Math.random() * this.renderer.dimensions[1]));
+
+      this.asteroids.push(asteroid);
+      this.entities.push(asteroid);
     }
 
     this.entities.push(this.ship);

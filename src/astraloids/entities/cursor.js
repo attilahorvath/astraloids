@@ -37,15 +37,7 @@ class Cursor extends Entity {
     this.integrateValues(deltaTime);
     this.calculateTransformation();
 
-    let a = vec2.fromValues(0.0, -30.0);
-    let b = vec2.fromValues(-25.0, 30.0);
-    let c = vec2.fromValues(25.0, 30.0);
-
-    vec2.transformMat4(a, a, game.gameState.ship.transformation);
-    vec2.transformMat4(b, b, game.gameState.ship.transformation);
-    vec2.transformMat4(c, c, game.gameState.ship.transformation);
-
-    this.hover = pointInTriangle(this.position, a, b, c);
+    this.hover = game.gameState.ship.containsPointInAll(this.position) || game.gameState.asteroids.some(asteroid => asteroid.containsPointInAll(this.position));
 
     if (this.hover) {
       game.renderer.fillVertexBuffer(this.vertexBuffer, this.hoverVertices);

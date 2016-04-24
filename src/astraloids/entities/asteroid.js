@@ -2,7 +2,7 @@
 
 import Entity from '../entity';
 
-import { triangulate } from '../math';
+import { pointInTriangle, triangulate } from '../math';
 
 const mat2 = require('gl-matrix').mat2;
 const mat4 = require('gl-matrix').mat4;
@@ -55,6 +55,20 @@ class Asteroid extends Entity {
     this.pointShader.pointSizeValue = 8.0;
     renderer.draw(this.pointShader, transformation, this.vertexBuffer, null, renderer.gl.POINTS, this.vertices.length / 7);
     renderer.draw(this.pointShader, transformation, this.vertexBuffer, null, renderer.gl.LINE_LOOP, this.vertices.length / 7);
+  }
+
+  containsPoint(point, transformation = mat4.create()) {
+    for (let i = 0; i < this.triangleIndices.length; i += 3) {
+      let a = vec2.transformMat4(vec2.create(), this.points[this.triangleIndices[i]], transformation);
+      let b = vec2.transformMat4(vec2.create(), this.points[this.triangleIndices[i + 1]], transformation);
+      let c = vec2.transformMat4(vec2.create(), this.points[this.triangleIndices[i + 2]], transformation);
+
+      if (pointInTriangle(point, a, b, c)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
 

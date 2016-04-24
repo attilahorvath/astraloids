@@ -82,6 +82,17 @@ class Entity {
     mat4.translate(this.transformation, this.transformation, translation);
     mat4.rotateZ(this.transformation, this.transformation, this.angle);
   }
+
+  containsPointInAll(point, transformation = mat4.create()) {
+    transformation = mat4.clone(transformation);
+    mat4.multiply(transformation, transformation, this.transformation);
+
+    return this.children.some(child => child.containsPoint(point, transformation)) || this.containsPoint(point, transformation);
+  }
+
+  containsPoint(point, transformation = mat4.create()) {
+    return false;
+  }
 }
 
 export default Entity;
