@@ -51,6 +51,7 @@ class Renderer {
     };
 
     this.lastVertexBuffer = null;
+    this.lastIndexBuffer = null;
     this.lastShaderProgram = null;
 
     this.enabledVertexAttributeArrays = {};
@@ -69,6 +70,8 @@ class Renderer {
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertexBuffer);
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertices), this.gl.STATIC_DRAW);
 
+    this.lastVertexBuffer = vertexBuffer;
+
     return vertexBuffer;
   }
 
@@ -80,6 +83,27 @@ class Renderer {
     }
 
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertices), this.gl.STATIC_DRAW);
+  }
+
+  createIndexBuffer(indices) {
+    let indexBuffer = this.gl.createBuffer();
+
+    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), this.gl.STATIC_DRAW);
+
+    this.lastIndexBuffer = indexBuffer;
+
+    return indexBuffer;
+  }
+
+  fillIndexBuffer(indexBuffer, indices) {
+    if (indexBuffer !== this.lastIndexBuffer) {
+      this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+
+      this.lastIndexBuffer = indexBuffer;
+    }
+
+    this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), this.gl.STATIC_DRAW);
   }
 
   setViewport(viewport) {
@@ -124,11 +148,17 @@ class Renderer {
     }
   }
 
-  draw(shader, transformation, vertexBuffer, mode, count, skipCamera = false) {
+  draw(shader, transformation, vertexBuffer, indexBuffer, mode, count, skipCamera = false) {
     if (vertexBuffer !== this.lastVertexBuffer) {
       this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertexBuffer);
 
       this.lastVertexBuffer = vertexBuffer;
+    }
+
+    if (indexBuffer !== this.lastIndexBuffer) {
+      this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+
+      this.lastIndexBuffer = indexBuffer;
     }
 
     shader.setVertexAttributes(this);
@@ -141,7 +171,11 @@ class Renderer {
 
     shader.use(this);
 
-    this.gl.drawArrays(mode, 0, count);
+    if (indexBuffer) {
+      this.gl.drawElements(mode, count, this.gl.UNSIGNED_SHORT, 0);
+    } else {
+      this.gl.drawArrays(mode, 0, count);
+    }
   }
 }
 

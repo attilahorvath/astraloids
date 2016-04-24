@@ -125,7 +125,7 @@ class Ship extends Entity {
   }
 
   draw(renderer, deltaTime, transformation = mat4.create()) {
-    renderer.draw(this.simpleShader, transformation, this.vertexBuffer, renderer.gl.TRIANGLES, 3);
+    renderer.draw(this.simpleShader, transformation, this.vertexBuffer, null, renderer.gl.TRIANGLES, 3);
   }
 
   emitSteeringParticles(emitter, renderer, count, velocityX, velocityY, transformation) {

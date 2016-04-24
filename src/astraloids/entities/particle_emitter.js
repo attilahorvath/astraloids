@@ -78,7 +78,7 @@ class ParticleEmitter extends Entity {
       this.particleShader.lifetimeValue = this.lifetime;
       this.particleShader.pointSizeValue = this.pointSize;
 
-      renderer.draw(this.particleShader, mat4.create(), this.vertexBuffer, renderer.gl.POINTS, this.vertexCount);
+      renderer.draw(this.particleShader, mat4.create(), this.vertexBuffer, null, renderer.gl.POINTS, this.vertexCount);
     }
   }
 }

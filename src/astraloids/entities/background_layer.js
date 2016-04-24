@@ -64,7 +64,7 @@ class BackgroundLayer extends Entity {
 
       this.calculateTransformation();
 
-      renderer.draw(this.pointShader, this.transformation, this.vertexBuffer, renderer.gl.POINTS, this.stars);
+      renderer.draw(this.pointShader, this.transformation, this.vertexBuffer, null, renderer.gl.POINTS, this.stars);
 
       this.position = vec2.clone(position);
     }

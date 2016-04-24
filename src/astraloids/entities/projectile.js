@@ -21,7 +21,7 @@ class Projectile extends Entity {
 
   draw(renderer, deltaTime, transformation = mat4.create()) {
     renderer.setLineWidth(3.0);
-    renderer.draw(this.simpleShader, transformation, this.vertexBuffer, renderer.gl.LINES, 2);
+    renderer.draw(this.simpleShader, transformation, this.vertexBuffer, null, renderer.gl.LINES, 2);
   }
 }
 

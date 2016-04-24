@@ -74,11 +74,7 @@ function triangulate(vertices) {
     }
   }
 
-  //let triangleIndices = triangles.map(triangle => vertices.indexOf(triangle));
-
-  //return triangleIndices;
-
-  return triangles;
+  return triangles.map(triangle => vertices.indexOf(triangle));
 }
 
 export { pointInTriangle, findEar, triangulate };

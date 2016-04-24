@@ -101,7 +101,7 @@ class PostProcessor {
 
     this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, (this.downscaled ? this.downscaledTextures : this.textures)[this.lastFramebuffer]);
 
-    this.renderer.draw(shader, mat4.create(), this.vertexBuffer, this.renderer.gl.TRIANGLES, 6, true);
+    this.renderer.draw(shader, mat4.create(), this.vertexBuffer, null, this.renderer.gl.TRIANGLES, 6, true);
 
     this.lastFramebuffer = currentFramebuffer;
 
@@ -122,7 +122,7 @@ class PostProcessor {
       this.renderer.gl.blendFunc(this.renderer.gl.SRC_ALPHA, this.renderer.gl.ONE);
     }
 
-    this.renderer.draw(shader, mat4.create(), this.vertexBuffer, this.renderer.gl.TRIANGLES, 6, true);
+    this.renderer.draw(shader, mat4.create(), this.vertexBuffer, null, this.renderer.gl.TRIANGLES, 6, true);
 
     if (additiveBlend) {
       this.renderer.gl.blendFunc(this.renderer.gl.SRC_ALPHA, this.renderer.gl.ONE_MINUS_SRC_ALPHA);

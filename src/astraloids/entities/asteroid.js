@@ -22,15 +22,15 @@ class Asteroid extends Entity {
       this.points.push(vertexPosition);
     }
 
-    this.trianglePoints = triangulate(this.points);
-
     this.triangleVertices = [];
+    this.triangleIndices = triangulate(this.points);
 
-    for (let point of this.trianglePoints) {
+    for (let point of this.points) {
       this.triangleVertices.push(point[0], point[1], 0.0, 1.0, 1.0, 1.0, 1.0);
     }
 
     this.triangleVertexBuffer = game.renderer.createVertexBuffer(this.triangleVertices);
+    this.triangleIndexBuffer = game.renderer.createIndexBuffer(this.triangleIndices);
 
     this.simpleShader = game.renderer.shaders.simpleShader;
 
@@ -50,11 +50,11 @@ class Asteroid extends Entity {
   }
 
   draw(renderer, deltaTime, transformation = mat4.create()) {
-    renderer.draw(this.simpleShader, transformation, this.triangleVertexBuffer, renderer.gl.TRIANGLES, this.triangleVertices.length / 7);
+    renderer.draw(this.simpleShader, transformation, this.triangleVertexBuffer, this.triangleIndexBuffer, renderer.gl.TRIANGLES, this.triangleIndices.length);
 
     this.pointShader.pointSizeValue = 8.0;
-    renderer.draw(this.pointShader, transformation, this.vertexBuffer, renderer.gl.POINTS, this.vertices.length / 7);
-    renderer.draw(this.pointShader, transformation, this.vertexBuffer, renderer.gl.LINE_LOOP, this.vertices.length / 7);
+    renderer.draw(this.pointShader, transformation, this.vertexBuffer, null, renderer.gl.POINTS, this.vertices.length / 7);
+    renderer.draw(this.pointShader, transformation, this.vertexBuffer, null, renderer.gl.LINE_LOOP, this.vertices.length / 7);
   }
 }
 
