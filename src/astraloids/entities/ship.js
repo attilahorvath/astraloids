@@ -60,12 +60,12 @@ class Ship extends Entity {
     }
 
     if (game.keyboardInput.keysDown[65] || game.keyboardInput.keysDown[37]) {
-      this.angularVelocity = -0.002;
+      this.angularVelocity -= 0.002;
       steeringLeft = true;
     }
 
     if (game.keyboardInput.keysDown[68] || game.keyboardInput.keysDown[39]) {
-      this.angularVelocity = 0.002;
+      this.angularVelocity += 0.002;
       steeringRight = true;
     }
 
