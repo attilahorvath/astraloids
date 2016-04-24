@@ -1,12 +1,16 @@
 'use strict';
 
-import KeyboardInput from './keyboard_input';
 import Renderer from './renderer';
+
+import KeyboardInput from './keyboard_input';
+import MouseInput from './mouse_input';
 
 class Game {
   constructor() {
-    this.keyboardInput = new KeyboardInput();
     this.renderer = new Renderer();
+
+    this.keyboardInput = new KeyboardInput();
+    this.mouseInput = new MouseInput(this.renderer);
   }
 
   run(gameState) {
@@ -21,6 +25,9 @@ class Game {
     requestAnimationFrame(() => this.loop());
 
     let deltaTime = currentTime - this.lastTime;
+
+    this.keyboardInput.update();
+    this.mouseInput.update();
 
     this.gameState.update(deltaTime);
     this.gameState.draw(deltaTime);

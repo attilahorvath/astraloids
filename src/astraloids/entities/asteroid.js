@@ -10,25 +10,29 @@ class Asteroid extends Entity {
   constructor(game, position = vec2.create(), velocity = vec2.create(), acceleration = vec2.create(), angle = 0.0, angularVelocity = 0.0, angularAcceleration = 0.0) {
     super(game, position, velocity, acceleration, angle, angularVelocity, angularAcceleration);
 
-    let vertices = [];
+    this.vertices = [];
 
     let color = 0.2 + Math.random() * 0.5;
 
-    for (let vertexAngle = 0.0; vertexAngle < Math.PI * 2.0; vertexAngle += (Math.PI * 2.0) / 8.0) {
+    for (let vertexAngle = 0.0; vertexAngle < Math.PI * 2.0; vertexAngle += Math.PI / (3.0 + Math.random() * 6.0)) {
       let vertexPosition = vec2.fromValues(0.0, -10.0 - Math.random() * 50.0);
       let rotation = mat2.create();
       mat2.rotate(rotation, rotation, vertexAngle);
       vec2.transformMat2(vertexPosition, vertexPosition, rotation);
-      vertices.push(vertexPosition[0], vertexPosition[1], 0.0, color, color, color, 1.0);
+      this.vertices.push(vertexPosition[0], vertexPosition[1], 0.0, 0.0, 1.0, 0.5, 1.0);
     }
 
-    this.vertexBuffer = game.renderer.createVertexBuffer(vertices);
+    this.vertexBuffer = game.renderer.createVertexBuffer(this.vertices);
 
-    this.simpleShader = game.renderer.shaders.simpleShader;
+    this.pointShader = game.renderer.shaders.pointShader;
+
+    this.angularVelocity = -0.0005 + Math.random() * 0.001;
   }
 
   draw(renderer, deltaTime, transformation = mat4.create()) {
-    renderer.draw(this.simpleShader, transformation, this.vertexBuffer, renderer.gl.TRIANGLE_FAN, 8);
+    this.pointShader.pointSizeValue = 8.0;
+    renderer.draw(this.pointShader, transformation, this.vertexBuffer, renderer.gl.POINTS, this.vertices.length / 7);
+    renderer.draw(this.pointShader, transformation, this.vertexBuffer, renderer.gl.LINE_LOOP, this.vertices.length / 7);
   }
 }
 
