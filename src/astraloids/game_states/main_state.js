@@ -5,6 +5,7 @@ import GameState from '../game_state';
 import Background from '../entities/background';
 import Ship from '../entities/ship';
 import Asteroid from '../entities/asteroid';
+import Cursor from '../entities/cursor';
 
 const vec2 = require('gl-matrix').vec2;
 
@@ -21,6 +22,7 @@ class MainState extends GameState {
     }
 
     this.entities.push(this.ship);
+    this.entities.push(new Cursor(this.game));
   }
 
   update(deltaTime) {
