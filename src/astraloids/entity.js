@@ -23,6 +23,7 @@ class Entity {
 
     this.calculateTransformation();
 
+    this.alive = true;
     this.children = [];
   }
 

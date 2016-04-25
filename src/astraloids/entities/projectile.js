@@ -24,7 +24,8 @@ class Projectile extends Entity {
 
     this.simpleShader = game.renderer.shaders.simpleShader;
 
-    this.active = true;
+    this.hit = false;
+    this.lifetime = 2000;
   }
 
   update(game, deltaTime, transformation = mat4.create()) {
@@ -32,6 +33,12 @@ class Projectile extends Entity {
     this.calculateTransformation();
 
     this.hit = game.gameState.asteroids.some(asteroid => asteroid.containsPointInAll(this.position));
+
+    this.lifetime -= deltaTime;
+
+    if (this.lifetime <= 0) {
+      this.alive = false;
+    }
   }
 
   draw(renderer, deltaTime, transformation = mat4.create()) {
