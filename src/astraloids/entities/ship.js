@@ -81,7 +81,7 @@ class Ship extends Entity {
       this.laserTimer -= deltaTime;
 
       if (this.laserTimer <= 0) {
-        let position = vec2.fromValues(0.0, -36.0);
+        let position = vec2.fromValues(0.0, -45.0);
         let velocity = vec2.fromValues(0.0, -0.5);
         let rotationMatrix = mat2.create();
 

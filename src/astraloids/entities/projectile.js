@@ -10,18 +10,38 @@ class Projectile extends Entity {
     super(game, position, velocity, acceleration, angle, angularVelocity, angularAcceleration);
 
     const vertices = [
-      0.0, -12.0, 0.0, 0.3, 1.0, 1.0, 1.0,
-      0.0,  12.0, 0.0, 0.3, 1.0, 1.0, 1.0
+      0.0,  0.0, 0.0, 0.3, 1.0, 1.0, 1.0,
+      0.0, 25.0, 0.0, 0.3, 1.0, 1.0, 1.0
+    ];
+
+    const hitVertices = [
+      0.0,  0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
+      0.0, 25.0, 0.0, 1.0, 0.0, 0.0, 1.0
     ];
 
     this.vertexBuffer = game.renderer.createVertexBuffer(vertices);
+    this.hitVertexBuffer = game.renderer.createVertexBuffer(hitVertices);
 
     this.simpleShader = game.renderer.shaders.simpleShader;
+
+    this.active = true;
+  }
+
+  update(game, deltaTime, transformation = mat4.create()) {
+    this.integrateValues(deltaTime);
+    this.calculateTransformation();
+
+    this.hit = game.gameState.asteroids.some(asteroid => asteroid.containsPointInAll(this.position));
   }
 
   draw(renderer, deltaTime, transformation = mat4.create()) {
     renderer.setLineWidth(3.0);
-    renderer.draw(this.simpleShader, transformation, this.vertexBuffer, null, renderer.gl.LINES, 2);
+
+    if (this.hit) {
+      renderer.draw(this.simpleShader, transformation, this.hitVertexBuffer, null, renderer.gl.LINES, 2);
+    } else {
+      renderer.draw(this.simpleShader, transformation, this.vertexBuffer, null, renderer.gl.LINES, 2);
+    }
   }
 }
 
