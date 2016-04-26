@@ -14,17 +14,10 @@ class Projectile extends Entity {
       0.0, 25.0, 0.0, 0.3, 1.0, 1.0, 1.0
     ];
 
-    const hitVertices = [
-      0.0,  0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
-      0.0, 25.0, 0.0, 1.0, 0.0, 0.0, 1.0
-    ];
-
     this.vertexBuffer = game.renderer.createVertexBuffer(vertices);
-    this.hitVertexBuffer = game.renderer.createVertexBuffer(hitVertices);
 
     this.simpleShader = game.renderer.shaders.simpleShader;
 
-    this.hit = false;
     this.lifetime = 2000;
   }
 
@@ -32,7 +25,7 @@ class Projectile extends Entity {
     this.integrateValues(deltaTime);
     this.calculateTransformation();
 
-    this.hit = game.gameState.asteroids.some(asteroid => asteroid.containsPointInAll(this.position));
+    game.gameState.asteroids.forEach(asteroid => asteroid.checkProjectile(this));
 
     this.lifetime -= deltaTime;
 
@@ -43,12 +36,7 @@ class Projectile extends Entity {
 
   draw(renderer, deltaTime, transformation = mat4.create()) {
     renderer.setLineWidth(3.0);
-
-    if (this.hit) {
-      renderer.draw(this.simpleShader, transformation, this.hitVertexBuffer, null, renderer.gl.LINES, 2);
-    } else {
-      renderer.draw(this.simpleShader, transformation, this.vertexBuffer, null, renderer.gl.LINES, 2);
-    }
+    renderer.draw(this.simpleShader, transformation, this.vertexBuffer, null, renderer.gl.LINES, 2);
   }
 }
 

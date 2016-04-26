@@ -113,7 +113,7 @@ class Ship extends Entity {
     }
 
     if (accelerating) {
-      this.thruster.emitParticle(game.renderer, vec2.create(), transformation, vec3.fromValues(0.5 + Math.random() * 0.5, 0, 0));
+      this.thruster.emitParticle(vec2.create(), transformation, vec3.fromValues(0.5 + Math.random() * 0.5, 0, 0));
     }
 
     if (decelerating) {
@@ -160,7 +160,7 @@ class Ship extends Entity {
       particles.push(new Particle(particleVelocity, vec3.fromValues(0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.5 + Math.random() * 0.5)));
     }
 
-    emitter.emitParticles(renderer, particles, transformation);
+    emitter.emitParticles(particles, transformation);
   }
 }
 

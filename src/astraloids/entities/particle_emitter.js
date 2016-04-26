@@ -14,7 +14,8 @@ class ParticleEmitter extends Entity {
   constructor(game, lifetime = 100.0, pointSize = 1.5, position = vec2.create(), velocity = vec2.create(), acceleration = vec2.create(), angle = 0.0, angularVelocity = 0.0, angularAcceleration = 0.0) {
     super(game, position, velocity, acceleration, angle, angularVelocity, angularAcceleration);
 
-    this.particleShader = game.renderer.shaders.particleShader;
+    this.renderer = game.renderer;
+    this.particleShader = this.renderer.shaders.particleShader;
 
     this.currentTime = 0;
     this.lifetime = lifetime;
@@ -24,14 +25,14 @@ class ParticleEmitter extends Entity {
     this.vertexCount = 0;
     this.vertexIndex = 0;
 
-    this.vertexBuffer = game.renderer.createVertexBuffer(this.vertices);
+    this.vertexBuffer = this.renderer.createVertexBuffer(this.vertices);
   }
 
-  emitParticle(renderer, velocity, transformation = mat4.create(), color = vec3.fromValues(Math.random(), Math.random(), Math.random())) {
-    this.emitParticles(renderer, [new Particle(velocity, color)], transformation);
+  emitParticle(velocity, transformation = mat4.create(), color = vec3.fromValues(Math.random(), Math.random(), Math.random())) {
+    this.emitParticles([new Particle(velocity, color)], transformation);
   }
 
-  emitParticles(renderer, particles, transformation = mat4.create()) {
+  emitParticles(particles, transformation = mat4.create()) {
     transformation = mat4.clone(transformation);
     mat4.multiply(transformation, transformation, this.transformation);
 
@@ -62,7 +63,7 @@ class ParticleEmitter extends Entity {
       this.vertices[arrayIndex++] = this.currentTime;
     }
 
-    renderer.fillVertexBuffer(this.vertexBuffer, this.vertices);
+    this.renderer.fillVertexBuffer(this.vertexBuffer, this.vertices);
   }
 
   update(game, deltaTime, transformation = mat4.create()) {

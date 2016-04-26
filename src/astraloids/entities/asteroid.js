@@ -1,12 +1,15 @@
 'use strict';
 
 import Entity from '../entity';
+import Particle from '../particle';
+import ParticleEmitter from './particle_emitter';
 
 import { pointInTriangle, triangulate } from '../math';
 
 const mat2 = require('gl-matrix').mat2;
 const mat4 = require('gl-matrix').mat4;
 const vec2 = require('gl-matrix').vec2;
+const vec3 = require('gl-matrix').vec3;
 
 class Asteroid extends Entity {
   constructor(game, position = vec2.create(), velocity = vec2.create(), acceleration = vec2.create(), angle = 0.0, angularVelocity = 0.0, angularAcceleration = 0.0) {
@@ -47,6 +50,10 @@ class Asteroid extends Entity {
     this.pointShader = game.renderer.shaders.pointShader;
 
     this.angularVelocity = -0.0005 + Math.random() * 0.001;
+
+    this.emitter = new ParticleEmitter(game, 500.0, 5.0);
+
+    this.children.push(this.emitter);
   }
 
   draw(renderer, deltaTime, transformation = mat4.create()) {
@@ -69,6 +76,32 @@ class Asteroid extends Entity {
     }
 
     return false;
+  }
+
+  checkProjectile(projectile) {
+    if (this.containsPointInAll(projectile.position)) {
+      vec2.add(this.velocity, this.velocity, vec2.scale(vec2.create(), projectile.velocity, 0.001));
+      this.emitParticles(25, vec2.scale(vec2.create(), projectile.velocity, -0.5), projectile.transformation);
+
+      projectile.alive = false;
+    }
+  }
+
+  emitParticles(count, velocity, transformation) {
+    let particles = [];
+
+    for (let i = 0; i < count; i++) {
+      let particleVelocityX = (0.2 + Math.random() * 0.2) * velocity[0];
+      let particleVelocityY = (0.2 + Math.random() * 0.2) * velocity[1];
+      let particleVelocity = vec2.fromValues(particleVelocityX, particleVelocityY);
+
+      let rotationMatrix = mat2.rotate(mat2.create(), mat2.create(), -0.2 + Math.random() * 0.4);
+      vec2.transformMat2(particleVelocity, particleVelocity, rotationMatrix);
+
+      particles.push(new Particle(particleVelocity, vec3.fromValues(0.2 + Math.random() * 0.3, 0.2 + Math.random() * 0.3, 0.3 + Math.random() * 0.3)));
+    }
+
+    this.emitter.emitParticles(particles, transformation);
   }
 }
 
