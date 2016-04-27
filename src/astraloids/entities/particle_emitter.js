@@ -6,7 +6,6 @@ import Particle from '../particle';
 const mat4 = require('gl-matrix').mat4;
 const vec2 = require('gl-matrix').vec2;
 const vec3 = require('gl-matrix').vec3;
-const vec4 = require('gl-matrix').vec4;
 
 const maxVertices = 1000;
 
@@ -66,14 +65,14 @@ class ParticleEmitter extends Entity {
     this.renderer.fillVertexBuffer(this.vertexBuffer, this.vertices);
   }
 
-  update(game, deltaTime, transformation = mat4.create()) {
+  update(game, deltaTime) {
     this.currentTime += deltaTime;
 
     this.integrateValues(deltaTime);
     this.calculateTransformation();
   }
 
-  draw(renderer, deltaTime, transformation = mat4.create()) {
+  draw(renderer) {
     if (this.vertexCount > 0) {
       this.particleShader.currentTimeValue = this.currentTime;
       this.particleShader.lifetimeValue = this.lifetime;

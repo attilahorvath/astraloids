@@ -2,11 +2,8 @@
 
 import Entity from '../entity';
 
-import { pointInTriangle } from '../math';
-
 const mat4 = require('gl-matrix').mat4;
 const vec2 = require('gl-matrix').vec2;
-const vec3 = require('gl-matrix').vec3;
 
 class Cursor extends Entity {
   constructor(game, position = vec2.create(), velocity = vec2.create(), acceleration = vec2.create(), angle = 0.0, angularVelocity = 0.0, angularAcceleration = 0.0) {
@@ -31,7 +28,7 @@ class Cursor extends Entity {
     this.simpleShader = game.renderer.shaders.simpleShader;
   }
 
-  update(game, deltaTime, transformation = mat4.create()) {
+  update(game, deltaTime) {
     vec2.subtract(this.position, game.mouseInput.position, game.renderer.camera.position);
 
     this.integrateValues(deltaTime);

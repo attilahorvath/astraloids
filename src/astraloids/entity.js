@@ -3,7 +3,6 @@
 const mat4 = require('gl-matrix').mat4;
 const vec2 = require('gl-matrix').vec2;
 const vec3 = require('gl-matrix').vec3;
-const vec4 = require('gl-matrix').vec4;
 
 class Entity {
   constructor(game, position = vec2.create(), velocity = vec2.create(), acceleration = vec2.create(), angle = 0.0, angularVelocity = 0.0, angularAcceleration = 0.0) {
@@ -38,7 +37,7 @@ class Entity {
     this.update(game, deltaTime, transformation);
   }
 
-  update(game, deltaTime, transformation = mat4.create()) {
+  update(game, deltaTime) {
     this.integrateValues(deltaTime);
     this.calculateTransformation();
   }
@@ -54,7 +53,7 @@ class Entity {
     this.draw(renderer, deltaTime, transformation);
   }
 
-  draw(renderer, deltaTime, transformation = mat4.create()) {}
+  draw() {}
 
   integrateValues(deltaTime) {
     let oldPosition = vec2.clone(this.position);
@@ -91,7 +90,7 @@ class Entity {
     return this.children.some(child => child.containsPoint(point, transformation)) || this.containsPoint(point, transformation);
   }
 
-  containsPoint(point, transformation = mat4.create()) {
+  containsPoint() {
     return false;
   }
 }

@@ -21,7 +21,7 @@ class Projectile extends Entity {
     this.lifetime = 2000;
   }
 
-  update(game, deltaTime, transformation = mat4.create()) {
+  update(game, deltaTime) {
     this.integrateValues(deltaTime);
     this.calculateTransformation();
 

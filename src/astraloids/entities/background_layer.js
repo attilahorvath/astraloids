@@ -2,7 +2,6 @@
 
 import Entity from '../entity';
 
-const mat4 = require('gl-matrix').mat4;
 const vec2 = require('gl-matrix').vec2;
 
 class BackgroundLayer extends Entity {
@@ -26,7 +25,7 @@ class BackgroundLayer extends Entity {
     this.pointShader = game.renderer.shaders.pointShader;
   }
 
-  update(game, deltaTime, transformation = mat4.create()) {
+  update(game) {
     vec2.scaleAndAdd(this.position, this.position, this.background.ship.deltaPosition, 1.0 / this.relativeVelocity);
 
     for (let i = 0; i <= 1; i++) {
@@ -40,7 +39,7 @@ class BackgroundLayer extends Entity {
     this.calculateTransformation();
   }
 
-  draw(renderer, deltaTime, transformation = mat4.create()) {
+  draw(renderer) {
     this.pointShader.pointSizeValue = this.pointSize;
 
     let position = vec2.clone(this.position);

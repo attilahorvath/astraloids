@@ -39,8 +39,6 @@ class Asteroid extends Entity {
 
     this.vertices = [];
 
-    let color = 0.2 + Math.random() * 0.5;
-
     for (let point of this.points) {
       this.vertices.push(point[0], point[1], 0.0, 0.0, 1.0, 0.5, 1.0);
     }
